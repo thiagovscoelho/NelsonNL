@@ -6,11 +6,12 @@ NL — Semantics core
 -/
 import Mathlib.Data.Set.Basic
 import Mathlib.Tactic
--- If you split Language.lean, swap the next two lines accordingly.
 import NL.Language
 
 open Classical Set
 noncomputable section
+
+universe u v
 
 namespace NL
 
@@ -62,8 +63,9 @@ def tset (M : Model α) : Formula α → Set M.W
 /-- Satisfaction at a world. -/
 @[simp] def Sat (M : Model α) (w : M.W) (A : Formula α) : Prop := w ∈ tset M A
 
-/-- Semantic validity. -/
-@[simp] def Valid (A : Formula α) : Prop := ∀ (M : Model α) (w : M.W), Sat M w A
+/-- Semantic validity (universe-polymorphic in the world sort). -/
+@[simp] def Valid (A : Formula α) : Prop :=
+  ∀ {v} (M : Model.{u, v} α) (w : M.W), Sat M w A
 
 end Model
 

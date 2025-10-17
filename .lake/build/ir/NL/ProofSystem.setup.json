@@ -1,0 +1,8 @@
+{"plugins": [],
+ "options": {},
+ "name": "NL.ProofSystem",
+ "isModule": false,
+ "importArts":
+ {"NL.Language":
+  ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\Language.olean"]},
+ "dynlibs": []}
