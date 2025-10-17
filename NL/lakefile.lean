@@ -1,12 +1,13 @@
 import Lake
 open Lake DSL
 
-package «nl» where
+package «NelsonNL» where
 
-lean_lib NL where
-  -- srcDir defaults to `./`, so `NL/*.lean` is fine.
+require mathlib from git
+  "https://github.com/leanprover-community/mathlib4.git"
 
--- optional: an executable for quick tests
 @[default_target]
+lean_lib NL
+
 lean_exe nlDemo where
   root := `Main
