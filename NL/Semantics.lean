@@ -109,6 +109,4 @@ lemma tset_conj_comm (M : Model α) (A B : Formula α) :
 
 end Simps
 
-
-
 end NL
