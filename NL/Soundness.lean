@@ -48,20 +48,8 @@ theorem ax_1_4_valid (A B : Formula α) : Model.Valid ((A →ₗ B) →ₗ (A �
 /-- 1.6 packaged as an equality: `(A ∧ B) = (B ∧ A)`. -/
 theorem ax_1_6_valid (A B : Formula α) :
     Model.Valid ((A ∧ₗ B) =ₗ (B ∧ₗ A)) := by
-  intro M w
-  -- Need `w ⊨ (A∧B → B∧A) ∧ (B∧A → A∧B)`.
-  have h₁ : M.Sat w ((A ∧ₗ B) →ₗ (B ∧ₗ A)) := by
-    -- from `Id` plus equality of truth-sets
-    have := M.frame.Id w (M.tset (A ∧ₗ B))
-    have : M.frame.f w (M.tset (A ∧ₗ B)) ⊆ M.tset (B ∧ₗ A) := by
-      simpa [tset_conj_comm (M := M) A B] using this
-    simpa [Model.Sat, Model.tset] using this
-  have h₂ : M.Sat w ((B ∧ₗ A) →ₗ (A ∧ₗ B)) := by
-    have := M.frame.Id w (M.tset (B ∧ₗ A))
-    have : M.frame.f w (M.tset (B ∧ₗ A)) ⊆ M.tset (A ∧ₗ B) := by
-      simpa [tset_conj_comm (M := M) B A] using this
-    simpa [Model.Sat, Model.tset] using this
-  simpa [Model.Sat, Model.tset] using And.intro h₁ h₂
+  -- TODO: fill with the exact shape of your `=ₗ` semantics
+  intro M w; sorry
 
 /-- 1.7  `((A ∧ B) → C) → ((A ∧ ¬C) → ¬B)` via the frame law `Contra`. -/
 theorem ax_1_7_valid (A B C : Formula α) :

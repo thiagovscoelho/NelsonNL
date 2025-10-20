@@ -1,0 +1,33 @@
+{"synthetic": false,
+ "outputs":
+ {"o": ["6602044160475550459"],
+  "i": "13061590973767528613",
+  "c": "13634292709241807111"},
+ "log":
+ [{"message":
+   ".> LEAN_PATH=C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\Cli\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\batteries\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\Qq\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\aesop\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\proofwidgets\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\importGraph\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\LeanSearchClient\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\plausible\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\mathlib\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean c:\\Users\\Thiago\\.elan\\toolchains\\leanprover--lean4---v4.24.0\\bin\\lean.exe C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Semantics.lean -o C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\Semantics.olean -i C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\Semantics.ilean -c C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\ir\\NL\\Semantics.c --setup C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\ir\\NL\\Semantics.setup.json --json",
+   "level": "trace"}],
+ "inputs":
+ [["NL.Semantics:deps",
+   [["deps",
+     [["NelsonNL/NL:extraDep", [["@NelsonNL:extraDep", "1723"]]],
+      ["imports",
+       [["Mathlib.Data.Set.Basic transitive imports (legacy)",
+         "14165077160705815133"],
+        ["Mathlib.Data.Set.Basic:importAllArts", "755438939901160768"],
+        ["Mathlib.Tactic transitive imports (legacy)", "9555731603289308665"],
+        ["Mathlib.Tactic:importAllArts", "16845572214284678408"],
+        ["NL.Language transitive imports (legacy)", "1723"],
+        ["NL.Language:importAllArts", "1010165834541742384"]]]]],
+    ["libs",
+     [["import dynlibs", "1723"],
+      ["package external libraries", "1723"],
+      ["module dynlibs", "1723"],
+      ["module plugins", "1723"]]]]],
+  ["Lean 4.24.0, commit 797c613eb9b6d4ec95db23e3e00af9ac6657f24b",
+   "1165570713881806064"],
+  ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Semantics.lean",
+   "15895194932731896767"],
+  ["options", "1723"],
+  ["Module.leanArgs: #[]", "1723"]],
+ "depHash": "4222316837758765453"}

@@ -65,7 +65,7 @@ def tset (M : Model α) : Formula α → Set M.W
 
 /-- Semantic validity (polymorphic over the world sort). -/
 @[simp] def Valid (A : Formula α) : Prop :=
-  ∀ (M : Model α) (w : M.W), Sat M w A
+  ∀ (M : Model.{u, v} α) (w : M.W), Sat M w A
 
 end Model
 
