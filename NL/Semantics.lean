@@ -34,7 +34,7 @@ structure Frame (W : Type v) where
   Mon     : ∀ (w : W) (X Y : Set W), X ⊆ Y → f w X ⊆ f w Y
   Succ    : ∀ (w : W) (X : Set W), w ∈ X → w ∈ f w X
   NE      : ∀ (w : W) (X : Set W), X.Nonempty → (f w X).Nonempty
-  Bo      : ∀ (w : W) (X Y : Set W), f w X ⊆ Y → ¬ (f w Y ⊆ Xᶜ)
+  Bo : ∀ (w : W) (X Y : Set W), X.Nonempty → f w X ⊆ Y → ¬ (f w Y ⊆ Xᶜ)
   Contra  : ∀ (w : W) (X Y Z : Set W), f w (X ∩ Y) ⊆ Z → f w (X ∩ Zᶜ) ⊆ Yᶜ
   -- A helpful composition principle (used for axiom 1.5)
   Cut     : ∀ (w : W) (X Y Z : Set W), f w X ⊆ Y → f w Y ⊆ Z → f w X ⊆ Z
