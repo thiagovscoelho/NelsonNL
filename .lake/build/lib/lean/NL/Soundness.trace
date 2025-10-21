@@ -1,14 +1,12 @@
 {"synthetic": false,
  "outputs":
- {"o": ["5300790431112993007"],
-  "i": "17245447012386061593",
+ {"o": ["7020044880263083212"],
+  "i": "3594127838584951484",
   "c": "6656386924101319585"},
  "log":
  [{"message":
    ".> LEAN_PATH=C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\Cli\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\batteries\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\Qq\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\aesop\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\proofwidgets\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\importGraph\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\LeanSearchClient\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\plausible\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\mathlib\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean c:\\Users\\Thiago\\.elan\\toolchains\\leanprover--lean4---v4.24.0\\bin\\lean.exe C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Soundness.lean -o C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\Soundness.olean -i C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\Soundness.ilean -c C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\ir\\NL\\Soundness.c --setup C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\ir\\NL\\Soundness.setup.json --json",
-   "level": "trace"},
-  {"message": "NL/Soundness.lean:49:8: declaration uses 'sorry'",
-   "level": "warning"}],
+   "level": "trace"}],
  "inputs":
  [["NL.Soundness:deps",
    [["deps",
@@ -24,7 +22,7 @@
   ["Lean 4.24.0, commit 797c613eb9b6d4ec95db23e3e00af9ac6657f24b",
    "1165570713881806064"],
   ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Soundness.lean",
-   "11870648147510314784"],
+   "6917014481547587420"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "6609489924651658234"}
+ "depHash": "2437805613209247679"}

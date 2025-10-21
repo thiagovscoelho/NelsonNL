@@ -45,38 +45,46 @@ theorem ax_1_4_valid (A B : Formula α) : Model.Valid ((A →ₗ B) →ₗ (A �
   have hC : M.frame.C v (M.tset A) (M.tset B) := M.frame.C_coh v (M.tset A) (M.tset B) hsub
   simpa [Model.tset] using hC
 
-/-- 1.6 packaged as an equality: `(A ∧ B) = (B ∧ A)`. -/
+/-- 1.6 packaged as an equality: `(A ∧ B) = (B ∧ A)`.
+
+`=ₗ` is mutual implication, so we prove both directions by turning
+subset-to-intersection into a pair of component-subset goals in the order we need.
+-/
 theorem ax_1_6_valid (A B : Formula α) :
     Model.Valid ((A ∧ₗ B) =ₗ (B ∧ₗ A)) := by
-  -- TODO: fill with the exact shape of your `=ₗ` semantics
-  intro M w; sorry
-
-/-- 1.7  `((A ∧ B) → C) → ((A ∧ ¬C) → ¬B)` via the frame law `Contra`. -/
-theorem ax_1_7_valid (A B C : Formula α) :
-  Model.Valid (((A ∧ₗ B) →ₗ C) →ₗ ((A ∧ₗ (¬ₗ C)) →ₗ (¬ₗ B))) := by
   intro M w
-  change M.frame.f w (M.tset ((A ∧ₗ B) →ₗ C)) ⊆ M.tset ((A ∧ₗ ¬ₗ C) →ₗ ¬ₗ B)
-  intro v hv
-  -- From Id, `v ∈ [[(A∧B)→C]]`, so at `v` we have `f_v [[A∧B]] ⊆ [[C]]`.
-  have hvX : v ∈ M.tset ((A ∧ₗ B) →ₗ C) := (M.frame.Id w (M.tset ((A ∧ₗ B) →ₗ C))) hv
-  have hsub : M.frame.f v (M.tset (A ∧ₗ B)) ⊆ M.tset C := by simpa [Model.tset] using hvX
-  -- Use `Contra` at `v` with intersections.
-  have hcontra : M.frame.f v (M.tset A ∩ (M.tset C)ᶜ) ⊆ (M.tset B)ᶜ :=
-    M.frame.Contra v (M.tset A) (M.tset B) (M.tset C) (by simpa [Model.tset] using hsub)
-  -- This is exactly `[[ (A ∧ ¬C) → ¬B ]]` at `v`.
-  simpa [Model.tset] using hcontra
-
-/-- R1 (modus ponens) is sound on NL-frames. -/
-lemma R1_modus_ponens {M : Model α} {w : M.W} {A B : Formula α}
-    (hA  : M.Sat w A) (hImp : M.Sat w (A →ₗ B)) : M.Sat w B := by
-  have hwf : w ∈ M.frame.f w (M.tset A) := M.frame.Succ w (M.tset A) hA
-  have hsub : M.frame.f w (M.tset A) ⊆ M.tset B := by simpa [Model.Sat, Model.tset] using hImp
-  exact hsub hwf
-
-/-- R2 (adjunction) is sound: if `w ⊨ A` and `w ⊨ B` then `w ⊨ A ∧ B`. -/
-lemma R2_adjunction {M : Model α} {w : M.W} {A B : Formula α}
-    (hA : M.Sat w A) (hB : M.Sat w B) : M.Sat w (A ∧ₗ B) := by
-  simpa [Model.Sat, Model.tset] using And.intro hA hB
+  -- Unfold `=ₗ` to the conjunction of two implications.
+  change w ∈ M.tset (((A ∧ₗ B) →ₗ (B ∧ₗ A)) ∧ₗ ((B ∧ₗ A) →ₗ (A ∧ₗ B)))
+  refine And.intro ?h₁ ?h₂
+  -- First direction: `(A ∧ B) → (B ∧ A)`
+  ·
+    -- Id gives f_w [[A∧B]] ⊆ [[A∧B]]; expand RHS and reorder components.
+    have hId : M.frame.f w (M.tset (A ∧ₗ B)) ⊆ M.tset (A ∧ₗ B) :=
+      M.frame.Id w (M.tset (A ∧ₗ B))
+    have hAB : M.frame.f w (M.tset (A ∧ₗ B)) ⊆ M.tset A ∩ M.tset B := by
+      simpa [Model.tset] using hId
+    -- Extract components in the order we want: first B, then A.
+    have hA : M.frame.f w (M.tset (A ∧ₗ B)) ⊆ M.tset A :=
+      fun x hx => (hAB hx).left
+    have hB : M.frame.f w (M.tset (A ∧ₗ B)) ⊆ M.tset B :=
+      fun x hx => (hAB hx).right
+    have hBA : M.frame.f w (M.tset (A ∧ₗ B)) ⊆ M.tset B ∩ M.tset A :=
+      (Set.subset_inter_iff.mpr ⟨hB, hA⟩)
+    simpa [Model.tset] using hBA
+  -- Second direction: `(B ∧ A) → (A ∧ B)`
+  ·
+    have hId : M.frame.f w (M.tset (B ∧ₗ A)) ⊆ M.tset (B ∧ₗ A) :=
+      M.frame.Id w (M.tset (B ∧ₗ A))
+    have hBA : M.frame.f w (M.tset (B ∧ₗ A)) ⊆ M.tset B ∩ M.tset A := by
+      simpa [Model.tset] using hId
+    -- Reorder to A then B.
+    have hB : M.frame.f w (M.tset (B ∧ₗ A)) ⊆ M.tset B :=
+      fun x hx => (hBA hx).left
+    have hA : M.frame.f w (M.tset (B ∧ₗ A)) ⊆ M.tset A :=
+      fun x hx => (hBA hx).right
+    have hAB : M.frame.f w (M.tset (B ∧ₗ A)) ⊆ M.tset A ∩ M.tset B :=
+      (Set.subset_inter_iff.mpr ⟨hA, hB⟩)
+    simpa [Model.tset] using hAB
 
 /-- 1.5  `(A ≠ B ≠ C) → (((A → B) ∧ (B → C)) → (A → C))`.
 
