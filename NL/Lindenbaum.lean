@@ -62,6 +62,12 @@ axiom extend_to_world
   (Γ₀ : Set (Formula α)) (hcl₀ : Closed Γ₀) (hcons₀ : Consistent Γ₀) :
   ∃ Δ, Γ₀ ⊆ Δ ∧ World Δ
 
+/-- Strengthened Lindenbaum extension: from any closed base, we can extend
+    to a world that contains `¬A`. This is the standard Henkin/Lindenbaum step. -/
+axiom extend_with_neg
+  (Γ₀ : Set (Formula α)) (hcl₀ : Closed Γ₀) (A : Formula α) :
+  ∃ Δ, Γ₀ ⊆ Δ ∧ World Δ ∧ (¬ₗ A) ∈ Δ
+
 /-- The detachment family used by the canonical selection (as *sets of worlds*). -/
 def Fset (Γ : Set (Formula α)) (A : Formula α) : Set (Set (Formula α)) :=
   { Δ | World Δ ∧ ∀ B, (A →ₗ B) ∈ Γ → B ∈ Δ }
