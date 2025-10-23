@@ -13,4 +13,4 @@ Current project status (AFAICT):
 - The files `ProofSystem.lean`, `Lindenbaum.lean`, and `Canonical.lean` are still as they were when I was wrongly assuming negation was classical in NL, so they are probably wrong.
 - The files `Examples.lean`, `Utils.lean`, and `Main.lean` have also not been reviewed for compliance yet, but they are just scaffolding.
 
-God help us.
+Despite all the wrong files, the current build mysteriously compiles. It is still not ready, however.
