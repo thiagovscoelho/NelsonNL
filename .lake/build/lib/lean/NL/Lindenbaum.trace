@@ -1,7 +1,7 @@
 {"synthetic": false,
  "outputs":
- {"o": ["2817600390697938305"],
-  "i": "17717261304990871289",
+ {"o": ["15417276552417405420"],
+  "i": "1645297990970874936",
   "c": "18049031129162149431"},
  "log":
  [{"message":
@@ -24,7 +24,7 @@
   ["Lean 4.24.0, commit 797c613eb9b6d4ec95db23e3e00af9ac6657f24b",
    "1165570713881806064"],
   ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Lindenbaum.lean",
-   "17109700103629355604"],
+   "16865707257452975322"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "7059882718508524022"}
+ "depHash": "387492602481576130"}
