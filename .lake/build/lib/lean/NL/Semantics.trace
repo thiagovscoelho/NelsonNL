@@ -1,7 +1,7 @@
 {"synthetic": false,
  "outputs":
- {"o": ["2501075747106524046"],
-  "i": "4460928302950107874",
+ {"o": ["14950912244471075841"],
+  "i": "1908000742482362539",
   "c": "13634292709241807111"},
  "log":
  [{"message":
@@ -27,7 +27,7 @@
   ["Lean 4.24.0, commit 797c613eb9b6d4ec95db23e3e00af9ac6657f24b",
    "1165570713881806064"],
   ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Semantics.lean",
-   "11132229008925746740"],
+   "1671358939444236785"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "6423362298039159162"}
+ "depHash": "17233753319197827848"}

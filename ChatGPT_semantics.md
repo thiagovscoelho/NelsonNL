@@ -13,149 +13,161 @@ R2 if ⊢ A and ⊢ B, then ⊢ (A ∧ B) (adjunction)
 
 where ◦ is a primitive binary consistency operator, (A|B) (inconsistency) is defined as ~(A ◦ B), A = B is defined as (A → B) ∧ (B → A), A ≠ B as ~ (A = B), and A ≠ B ≠ C is an abbreviation of (A ≠ B) ∧ (B ≠ C) ∧ (A ≠ C).
 
-Try to come up with a sound and complete semantics for NL.
+Try to come up with a sound and complete semantics for NL.---------------------------------------------------------------------------------------------------------------------------------------------
 
-------------------------------------------------------------------------------------------------------------------------------------------------
+Here is a **self-contained semantics** for NL that (i) uses a genuinely **intuitionistic negation** (so `~~A → A` is not valid in general), (ii) validates exactly the axioms/rules you listed, and (iii) comes with a standard soundness/completeness sketch.
 
-Below is a compact, fully-worked semantics that validates exactly the NL axioms/rules listed and is strong enough to be complete. It’s a “conditional-selection” semantics (in the spirit of Stalnaker/Lewis and the usual semantics for conditional logics), augmented with a primitive, symmetric compatibility/consistency predicate for ◦ and two frame conditions that capture the connexive features (Boethius and the contraposition-like 1.7).
+# NL semantics (with intuitionistic negation)
 
-I’ll first define the models, then give the truth-clauses, then list the frame conditions we need (they are very natural), and finally sketch soundness and completeness.
+We read `~` intuitionistically (Kripke negation), keep `∧` truth-functional, treat `→` in a guarded, relational way (parametrized by the current world), and take `◦` as a **primitive compatibility** connective constrained only as much as the axioms require.
 
-## NL frames and models
+## Frames and models
 
-An **NL-frame** is a triple
+An **NL-frame** is a quadruple
 [
-\mathcal F=\langle W,; f,; C\rangle
+\mathcal F=\langle W,\ \le,\ f,\ C\rangle
 ]
 where
 
-* (W) is a nonempty set of worlds.
-* For each (w\in W), (f_w:\mathcal P(W)\to \mathcal P(W)) is a **selection function** (think: the set (f_w(X)) are the “relevant (X)–cases” at (w)).
-* For each (w\in W), (C_w\subseteq \mathcal P(W)\times \mathcal P(W)) is a **compatibility** (consistency) relation on sets of worlds; we use it to interpret (A\circ B).
+* ((W,\le)) is a nonempty **preorder** (intuitionistic accessibility); write (v\ge w) for (w\le v).
+* For each (w\in W), (f_w:\mathrm{Up}(W)\to\mathcal P(W)) is a **selection map** on up-sets (defined below).
+* For each (w\in W), (C_w:\mathrm{Up}(W)\times\mathrm{Up}(W)\to{\mathsf{true},\mathsf{false}}) is a **compatibility/consistency predicate** (used for (A\circ B)).
 
-An **NL-model** is a frame (\mathcal F) together with a valuation (V:\text{Atoms}\to\mathcal P(W)). For any formula (A), let (\llbracket A\rrbracket^\mathcal M={w\in W: \mathcal M,w\models A}) be its truth set.
+Here (\mathrm{Up}(W)) denotes the family of **up-sets** (X\subseteq W) (i.e., (w\in X\le v\Rightarrow v\in X)).
+
+An **NL-model** is (\mathcal M=\langle \mathcal F,\ V\rangle) where (V) assigns to each atom (p) an **up-set** (V(p)\subseteq W) (persistence of atoms).
+
+For any formula (A), write (\llbracket A\rrbracket={w\in W:\mathcal M,w\models A}).
 
 ## Truth clauses
 
-Extend (V) to all formulas as follows (classical pointwise (\sim) and (\wedge); non-truth-functional (\to) via selection; primitive (\circ) via (C)):
+Let (X=\llbracket A\rrbracket) and (Y=\llbracket B\rrbracket).
 
-* (\mathcal M,w\models p) iff (w\in V(p)) (for atoms (p)).
-* (\mathcal M,w\models A\wedge B) iff (\mathcal M,w\models A) and (\mathcal M,w\models B).
-* (\mathcal M,w\models \sim A) iff (\mathcal M,w\not\models A).  (So (\sim) is classical negation.)
-* (\mathcal M,w\models A\to B) iff (f_w(\llbracket A\rrbracket^\mathcal M)\subseteq \llbracket B\rrbracket^\mathcal M).
-* (\mathcal M,w\models A\circ B) iff (C_w\big(\llbracket A\rrbracket^\mathcal M,\llbracket B\rrbracket^\mathcal M\big)).
+* (w\models p)  iff  (w\in V(p)) (and (V) is monotone: (w\in V(p)\le v\Rightarrow v\in V(p))).
+* (w\models A\wedge B)  iff  (w\models A) and (w\models B).
+* **Intuitionistic negation**:
+  (w\models \sim A)  iff  for all (v\ge w), (v\not\models A).
+  Equivalently, (\llbracket \sim A\rrbracket=\neg X:={w:\uparrow w\cap X=\varnothing}), which is an up-set.
+* **Conditional**:
+  (w\models A\to B)  iff  (f_w(X)\subseteq Y).
+* **Consistency**:
+  (w\models A\circ B)  iff  (C_w(X,Y)).
 
-Write (A=B) as usual for mutual implication, and (A\neq B) as its negation; those are just abbreviations in the object language.
+Abbreviations: (A|B:=\sim(A\circ B)), (A=B:=(A\to B)\wedge(B\to A)), (A\neq B:=\sim(A=B)).
 
-## Frame conditions (the “NL-frame” axioms)
+## Frame conditions
 
-We assume every NL-frame satisfies the following conditions, for all (w\in W) and all (X,Y,Z\subseteq W):
+All NL-frames satisfy, for all (w\in W) and (X,Y,Z\in\mathrm{Up}(W)):
 
-**On the conditional (f_w):**
+### For the conditional (f_w)
 
 1. **Identity (Id)**: (f_w(X)\subseteq X).
-   (This forces (A\to A), axiom 1.1.)
+   (Ensures (A\to A).)
 
-2. **Monotonicity (Mon)**: If (X\subseteq Y) then (f_w(X)\subseteq f_w(Y)).
-   (Gives the transitivity pattern used in 1.5.)
+2. **Hereditary in the world (Her)**: If (v\ge w) then (f_v(X)\subseteq f_w(X)).
+   (Makes (\llbracket A\to B\rrbracket) an up-set, i.e., intuitionistic persistence.)
 
-3. **Success (Detachment) (Succ)**: If (w\in X) then (w\in f_w(X)).
-   (Delivers local modus ponens and validates rule R1.)
+3. **Success / local detachment (Succ)**: If (w\in X) then (w\in f_w(X)).
+   (Gives sound Modus Ponens.)
 
-4. **Nonemptiness on nonempty input (NE)**: If (X\neq\varnothing) then (f_w(X)\neq\varnothing).
-   (Blocks vacuous truths from producing connexive failures.)
+4. **Contraposition-like law (Contra)**:
+   If (f_w(X\cap Y)\subseteq Z) then (f_w\big(X\cap \neg Z\big)\subseteq \neg Y),
+   where (\neg Z:={u:\uparrow u\cap Z=\varnothing}).
+   (This is exactly axiom 1.7 at the set level.)
 
-5. **Boethius/Connexive condition (Bo)**: If (f_w(X)\subseteq Y) then (f_w(Y)\nsubseteq W\setminus X).
-   (Captures ((A\to B)\Rightarrow \neg(B\to \sim A)).)
+5. **Guarded syllogism (Tr≠)**:
+   Define, at world (w), a **local equivalence** (X\equiv_w Y) iff (f_w(X)\subseteq Y) and (f_w(Y)\subseteq X).
+   Write (X\not\equiv_w Y) for its negation.
+   Then require:
+   [
+   \text{if }X\not\equiv_w Y,\ Y\not\equiv_w Z,\ X\not\equiv_w Z\ \text{ and }
+   f_w(X)\subseteq Y,\ f_w(Y)\subseteq Z,\ \text{ then } f_w(X)\subseteq Z.
+   ]
+   (Gives exactly axiom 1.5.)
 
-6. **Contraposition-like condition (Contra)**: If (f_w(X\cap Y)\subseteq Z) then (f_w\big(X\cap (W\setminus Z)\big)\subseteq W\setminus Y).
-   (This is exactly axiom-schema 1.7 in set form.)
+> *Remark.* If you prefer, you may **strengthen** (Tr≠) to the unconditional **Hypothetical Syllogism**
+> (f_w(X)\subseteq Y) and (f_w(Y)\subseteq Z\Rightarrow f_w(X)\subseteq Z).
+> That makes 1.5 trivial and validates (((A\to B)\wedge(B\to C))\to(A\to C)) outright; the axioms above only demand the weaker, guarded version, so (Tr≠) is the precise match.
 
-**On compatibility (C_w):**
+### For compatibility (C_w)
 
-7. **Symmetry (C-Sym)**: (C_w(X,Y)\iff C_w(Y,X)).
-   (Delivers axiom 1.2.)
+6. **Symmetry (C-Sym)**: (C_w(X,Y)\iff C_w(Y,X)).
+   (Yields ( (A|B)\to(B|A)), axiom 1.2.)
 
-8. **Conditional coherence (C-Coherence)**: If (f_w(X)\subseteq Y) then (C_w(X,Y)).
-   (This is axiom 1.4: from (A\to B) infer (A\circ B).)
+7. **Coherence with (\to) (C-Coherence)**: If (f_w(X)\subseteq Y) then (C_w(X,Y)).
+   (Exactly axiom 1.4: ((A\to B)\to(A\circ B)).)
 
-No further constraints on (C_w) are required for the NL axioms given.
+No further connection between (C) and (f) is assumed (beyond what the axioms force).
 
-## What the conditions mean (intuitively)
+## Soundness (each axiom/rule is valid)
 
-* (f_w) says which (A)-worlds are “relevant” at (w) when checking (A\to B). (Id) makes (A\to A) valid. (Succ) makes modus-ponens sound. (NE)+(Bo) deliver connexive behavior: if (A\to B) holds, then (B\to\sim A) must fail. (Contra) is exactly 1.7 turned into set-inclusion.
-* (C_w) is a **primitive** compatibility predicate; we only need it to be symmetric and to accept every pair ((X,Y)) when (X) relevantly entails (Y) (C-Coherence). This is deliberately weak: the axioms listed do not force a tighter reading of (\circ), so we keep it as general as possible while still making 1.2 and 1.4 valid.
+Let (\mathcal M=\langle W,\le,f,C,V\rangle) be any NL-model; put (X=\llbracket A\rrbracket), etc.
 
-## Soundness (axioms and rules are valid)
+* **1.1** (A\to A): by **Id**, (f_w(X)\subseteq X).
+* **1.2** ((A|B)\to(B|A)): since (C) is symmetric at every world, (\llbracket A\circ B\rrbracket=\llbracket B\circ A\rrbracket), hence (\llbracket\sim(A\circ B)\rrbracket\subseteq\llbracket\sim(B\circ A)\rrbracket); with **Id** this makes the implication valid.
+* **1.3** (A\to ~~A): in Kripke semantics (X\subseteq\neg\neg X); then (f_w(X)\subseteq X\subseteq\neg\neg X) by **Id**.
+* **1.4** ((A\to B)\to(A\circ B)): by **C-Coherence**.
+* **1.5** Guarded transitivity: the inner (((A\to B)\wedge(B\to C))\to(A\to C)) is guaranteed **at any (w)** exactly when (A,B,C) are pairwise ( \not\equiv_w); that is precisely the hypothesis of (Tr≠). So the whole axiom is valid.
+* **1.6** ((A\wedge B)=(B\wedge A)): (\llbracket A\wedge B\rrbracket=\llbracket B\wedge A\rrbracket) set-theoretically, so each direction of (=) holds by 1.1.
+* **1.7** (((A\wedge B)\to C)\to((A\wedge \sim C)\to \sim B)): writing (X=\llbracket A\rrbracket), (Y=\llbracket B\rrbracket), (Z=\llbracket C\rrbracket), the antecedent is (f_w(X\cap Y)\subseteq Z); **Contra** gives (f_w(X\cap \neg Z)\subseteq \neg Y), i.e., the consequent.
+* **R1 (modus ponens)**: if (w\in X) and (f_w(X)\subseteq Y), then by **Succ**, (w\in f_w(X)\subseteq Y), so (w\models B).
+* **R2 (adjunction)**: immediate from the clause for (\wedge).
 
-Let (\mathcal M=\langle W,f,C,V\rangle) be any NL-model.
-
-* **1.1 (A\to A)**: At any (w), (f_w(\llbracket A\rrbracket)\subseteq \llbracket A\rrbracket) by (Id).
-* **1.2 ((A|B)\to (B|A))**: ((A|B)) is (\sim(A\circ B)). By (C-Sym), (C_w(X,Y)\iff C_w(Y,X)). Hence if (\neg C_w(X,Y)) then (\neg C_w(Y,X)).
-* **1.3 (A\to \sim\sim A)**: (\sim\sim A) is equivalent to (A) under classical negation, so this is just 1.1.
-* **1.4 ((A\to B)\to (A\circ B))**: If (f_w(\llbracket A\rrbracket)\subseteq \llbracket B\rrbracket), then by (C-Coherence), (C_w(\llbracket A\rrbracket,\llbracket B\rrbracket)), i.e., (A\circ B).
-* **1.5 ((A\neq B\neq C)\to(((A\to B)\wedge (B\to C))\to (A\to C)))**: The inner implication is validated by (Mon): if (f_w(\llbracket A\rrbracket)\subseteq \llbracket B\rrbracket) and (f_w(\llbracket B\rrbracket)\subseteq \llbracket C\rrbracket), then (f_w(\llbracket A\rrbracket)\subseteq f_w(\llbracket B\rrbracket)\subseteq \llbracket C\rrbracket). The outer antecedent only strengthens it further, so the whole axiom is valid.
-* **1.6 ((A\wedge B)=(B\wedge A))**: (\llbracket A\wedge B\rrbracket=\llbracket B\wedge A\rrbracket) set-theoretically, hence each direction ((A\wedge B)\to (B\wedge A)) and converse hold by (Id).
-* **1.7 (((A\wedge B)\to C)\to ((A\wedge \sim C)\to \sim B))**: Let (X=\llbracket A\rrbracket), (Y=\llbracket B\rrbracket), (Z=\llbracket C\rrbracket). The antecedent says (f_w(X\cap Y)\subseteq Z). By (Contra), (f_w(X\cap (W\setminus Z))\subseteq W\setminus Y), i.e., (f_w(\llbracket A\wedge \sim C\rrbracket)\subseteq \llbracket \sim B\rrbracket). That is exactly the consequent.
-* **R1 (modus ponens)**: If (\mathcal M,w\models A) and (\mathcal M,w\models A\to B), then (w\in \llbracket A\rrbracket\subseteq f_w(\llbracket A\rrbracket)\subseteq \llbracket B\rrbracket) by (Succ). Thus (w\models B).
-* **R2 (adjunction)**: If (A) and (B) are true at (w), then (A\wedge B) is true at (w) by the clause for (\wedge).
-
-Hence every NL theorem is valid in every NL-model.
+Thus every NL-theorem is valid on all NL-frames.
 
 ## Completeness (canonical model sketch)
 
-Let (\vdash) be NL-provability from the axioms and rules. Build a canonical model (\mathcal M^\ast=\langle W^\ast, f^\ast, C^\ast, V^\ast\rangle) as follows.
+Let (\vdash) be provability from the NL axioms/rules.
 
-**Worlds.** (W^\ast) is the set of all **maximal NL-consistent theories** (\Gamma) (i.e., sets of formulas closed under (\vdash), containing no contradiction in the sense of deriving every formula, and maximal under inclusion).
+**Worlds.** (W^\ast) is the set of all **maximal NL-consistent** theories (\Gamma) (closed under (\vdash), not proving every formula, and maximal under inclusion).
 
-**Valuation.** (V^\ast(p)={\Gamma\in W^\ast: p\in \Gamma}). Extend (\sim,\wedge) pointwise (standard canonical model moves).
+**Order.** (\Gamma\le\Delta) iff (\Gamma\subseteq\Delta) (so (\le) is a preorder).
 
-**Selection.** For each (\Gamma\in W^\ast) and formula (A), define
+**Valuation.** (V^\ast(p)={\Gamma\in W^\ast: p\in\Gamma}) (which is upward-closed).
+
+**Selection.** For each (\Gamma\in W^\ast) and formula (A), let
 [
-F_\Gamma(A);:=;{\Delta\in W^\ast:\ \forall B\ (A\to B\in \Gamma\ \Rightarrow\ B\in \Delta)}.
+F_\Gamma(A)=\Big{\Delta\in W^\ast:\ \Delta\ge \Gamma\ \text{ and }\ \forall B\ \big((A\to B)\in\Gamma\Rightarrow B\in\Delta\big)\Big}.
 ]
-This is the set of (A)-detachment points for (\Gamma). Now set
-[
-f^\ast_\Gamma\big(\llbracket A\rrbracket^{\mathcal M^\ast}\big)\ :=\ F_\Gamma(A).
-]
-(One checks that if (\Gamma\vdash A=B) then (F_\Gamma(A)=F_\Gamma(B)), so (f^\ast_\Gamma) is well-defined on truth sets.)
+Set (f^\ast_\Gamma(\llbracket A\rrbracket):=F_\Gamma(A)). (This is well-defined on truth sets: if (\Gamma\vdash A=B) then (F_\Gamma(A)=F_\Gamma(B)).)
 
 **Compatibility.** Put
 [
-C^\ast_\Gamma!\big(\llbracket A\rrbracket^{\mathcal M^\ast},\llbracket B\rrbracket^{\mathcal M^\ast}\big)\quad\text{iff}\quad A\circ B\in \Gamma.
+C^\ast_\Gamma(\llbracket A\rrbracket,\llbracket B\rrbracket)\ \text{ iff }\ A\circ B\in\Gamma.
 ]
-(Again, because (\circ) occurs only positively in 1.2 and 1.4, one proves that if (\Gamma\vdash A=B) and (\Gamma\vdash A'=B') then (\Gamma\vdash (A\circ A')\leftrightarrow (B\circ B')), so this is well-defined on truth sets.)
 
 **Truth Lemma.** For all (\Gamma\in W^\ast) and formulas (A),
 [
-\mathcal M^\ast,\Gamma \models A \quad\Longleftrightarrow\quad A\in \Gamma.
+\mathcal M^\ast,\Gamma\models A\quad\Longleftrightarrow\quad A\in\Gamma.
 ]
-The Boolean cases are routine. For (\to):
-(\Rightarrow): If (\Gamma\models A\to B), then (F_\Gamma(A)\subseteq \llbracket B\rrbracket), hence by maximality and the definition of (F_\Gamma(A)) we get (A\to B\in \Gamma).
-(\Leftarrow): If (A\to B\in \Gamma), then by definition of (F_\Gamma(A)), every (\Delta\in F_\Gamma(A)) contains (B), i.e., (F_\Gamma(A)\subseteq \llbracket B\rrbracket).
-For (\circ): by the definition of (C^\ast).
+Proof is by induction on (A). The Boolean cases are routine (with the Kripke clause for (\sim)). For (A\to B):
 
-**Frame conditions in the canonical model.** One checks:
+* ((\Leftarrow)): If (A\to B\in\Gamma), then by definition every (\Delta\in F_\Gamma(A)) contains (B), i.e., (F_\Gamma(A)\subseteq \llbracket B\rrbracket).
+* ((\Rightarrow)): If (F_\Gamma(A)\subseteq \llbracket B\rrbracket) but (A\to B\notin\Gamma), extend (\Gamma) inside (W^\ast) to some (\Delta\ge\Gamma) with (A\in\Delta) and (B\notin\Delta); then (\Delta\in F_\Gamma(A)) yet (\Delta\not\models B), a contradiction.
 
-* (Id) because (A\to A) is an axiom, (A\in\Delta) for all (\Delta\in F_\Gamma(A)).
-* (Mon) because from (\vdash (A\wedge (A\to B))\to B) (derivable using R1/R2), we get (F_\Gamma(A)\subseteq F_\Gamma(B)) whenever (\Gamma\vdash A\to B).
-* (Succ) since (\Gamma) is closed under modus ponens: if (A\in\Gamma) and (A\to B\in \Gamma), then (B\in \Gamma); thus (\Gamma\in F_\Gamma(A)).
-* (NE) because if (A\in\Gamma) then (\Gamma\in F_\Gamma(A)).
-* (Bo) because ((A\to B)\to \neg(B\to \sim A)) is provable from 1.4 and 1.2 (read via (C^\ast)), hence cannot have (F_\Gamma(B)\subseteq W^\ast\setminus \llbracket A\rrbracket).
-* (Contra) is provable in the object language as 1.7; thus holds set-theoretically by the truth lemma.
-* (C-Sym) is axiom 1.2, hence holds by the truth lemma.
-* (C-Coherence) is axiom 1.4, hence holds by the truth lemma.
+For (A\circ B) the clause is by definition of (C^\ast).
 
-Therefore (\mathcal M^\ast) is an NL-model. By the Truth Lemma, if (A) is valid in all NL-models then (A\in \Gamma) for every (\Gamma\in W^\ast); hence (\vdash A). That gives **strong completeness**.
+**Frame conditions in (\mathcal M^\ast).** Each of **Id**, **Her**, **Succ**, **Contra**, **C-Sym**, **C-Coherence**, and **Tr≠** holds in (\mathcal M^\ast), because its corresponding axiom-schema (respectively 1.1, persistence of theorems, R1, 1.7, 1.2, 1.4, 1.5) is provable, and the Truth Lemma transfers provability to the relational side.
 
-## Summary of the semantics
+Hence, if a formula is valid in all NL-frames, it belongs to every maximal NL-theory; so (\vdash A). This yields **strong completeness**.
 
-* **Semantics**: selection-function conditional (A\to B) with classical (\sim) and (\wedge), plus a **primitive symmetric** compatibility predicate (C_w) for (A\circ B).
-* **Key frame laws**: (Id), (Mon), (Succ), (NE), (Bo), (Contra) for (f_w); (C-Sym) and (C-Coherence) for (C_w).
-* **Result**: With these frames, **all NL axioms and rules are sound**, and by the canonical construction above, **the semantics is complete** for NL.
+## Tiny countermodel to (~~p\to p) (showing non-classical negation)
 
-This gives a clean, fully compositional, set-based semantics that treats ◦ as a genuine (but weakly constrained) compatibility connective and pins down exactly the connexive behavior encoded by 1.2, 1.4, and 1.7. If you want a **more intensional** reading of ◦ (e.g., defining (A\circ B) as the conjunction of (\neg(A\to\sim B)) and (\neg(B\to\sim A))), you can add that definition **on top** of the above by replacing (C-Coherence) with the biconditional
-[
-C_w(X,Y)\ \text{iff}\ \neg\big(f_w(X)\subseteq W\setminus Y\big)\ \text{and}\ \neg\big(f_w(Y)\subseteq W\setminus X\big),
-]
-but then you must keep (NE) to avoid vacuity and adjust a few details in the completeness proof. The skeleton above already ensures all the listed NL theorems hold and yields a clean completeness argument.
+Let (W={w<v}) (a 2-node chain), (V(p)={v}).
+Let (f_u(X)=X\cap\uparrow u) (a concrete choice satisfying Id/Her/Succ/Contra), and let (C_u) be any symmetric predicate obeying C-Coherence (e.g., always-true).
+
+Then
+
+* (w\models \sim\sim p): above (w) there is a node (v) with (p), so (\sim p) fails at (w); hence (\sim\sim p) holds at (w).
+* But (w\not\models p).
+
+So (~~p\to p) is **not** valid, as desired, while 1.1–1.7 and R1–R2 still hold.
+
+## What this buys you
+
+* **Negation is intuitionistic** (1.3 holds; (~~A\to A) fails in general).
+* The **conditional** is world-relative (via (f_w)) but constrained just enough to validate 1.1, 1.5, and 1.7; the dedicated (Tr≠) condition captures the side-conditioned transitivity **exactly** as in axiom 1.5.
+* The **consistency** connective (A\circ B) is primitive with only symmetry and the coherence link to (\to) that the axioms require (1.2, 1.4).
+* The system is **sound and strongly complete** for the class of NL-frames above.
+
+If you prefer an even more concrete presentation, you can *instantiate* (f_w) by the canonical Kripke choice (f_w(X)=X\cap\uparrow w) (so (w\models A\to B) iff every (A)-world (\ge w) is a (B)-world). This automatically satisfies Id/Her/Succ/Contra; you then only need (C-Sym), (C-Coherence) and (Tr≠) to match the axioms involving `◦` and 1.5.
