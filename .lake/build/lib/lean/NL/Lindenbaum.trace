@@ -12,9 +12,9 @@
    [["deps",
      [["NelsonNL/NL:extraDep", [["@NelsonNL:extraDep", "1723"]]],
       ["imports",
-       [["NL.Semantics transitive imports (legacy)", "2632746361903053904"],
+       [["NL.Semantics transitive imports (legacy)", "8278479427972197967"],
         ["NL.Semantics:importAllArts", "17531333446741278270"],
-        ["NL.ProofSystem transitive imports (legacy)", "14711919809574944561"],
+        ["NL.ProofSystem transitive imports (legacy)", "17686458983870144006"],
         ["NL.ProofSystem:importAllArts", "12223027573280370676"]]]]],
     ["libs",
      [["import dynlibs", "1723"],
@@ -27,4 +27,4 @@
    "17109700103629355604"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "738842612829321385"}
+ "depHash": "7643005671484435521"}
