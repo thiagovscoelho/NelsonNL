@@ -12,14 +12,14 @@
    [["deps",
      [["NelsonNL/NL:extraDep", [["@NelsonNL:extraDep", "1723"]]],
       ["imports",
-       [["NL.Canonical transitive imports (legacy)", "10619904005134230930"],
-        ["NL.Canonical:importAllArts", "7063309539034987413"],
+       [["NL.Canonical transitive imports (legacy)", "4901744088525670674"],
+        ["NL.Canonical:importAllArts", "15194775215623137996"],
         ["NL.Examples transitive imports (legacy)", "9678301312958239136"],
         ["NL.Examples:importAllArts", "14229338120272894237"],
         ["NL.Language transitive imports (legacy)", "1723"],
         ["NL.Language:importAllArts", "13841876752982759957"],
         ["NL.Lindenbaum transitive imports (legacy)", "12705937416562939681"],
-        ["NL.Lindenbaum:importAllArts", "16175506170750780227"],
+        ["NL.Lindenbaum:importAllArts", "4457946917810270329"],
         ["NL.ProofSystem transitive imports (legacy)", "17686458983870144006"],
         ["NL.ProofSystem:importAllArts", "12223027573280370676"],
         ["NL.Semantics transitive imports (legacy)", "8278479427972197967"],
@@ -39,4 +39,4 @@
    "2151785428250520458"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "9729462748550230662"}
+ "depHash": "5033927822976919497"}

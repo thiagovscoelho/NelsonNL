@@ -4,7 +4,6 @@ NL — Canonical semantics, Truth Lemma, Completeness (intuitionistic version)
 * Canonical worlds are `World` sets from NL.Lindenbaum (no classical negation).
 * Negation `¬ₗ` uses the Kripke clause: Γ ⊨ ¬A  iff  for all Δ ≥ Γ, not (Δ ⊨ A).
 * Implication uses the detachment family `Fset Γ A` (via NL.Lindenbaum).
-* Completeness uses `extend_with_neg` + the (Kripke) Truth Lemma for `¬ₗ`.
 -/
 import NL.Semantics
 import NL.ProofSystem
@@ -85,20 +84,10 @@ lemma mem_Fcan_of_Fset
   ∃ Δ : WCan α, Δ ∈ Fcan Γ A ∧ Δ.carrier = Δ0 := by
   rcases h with ⟨hWΔ0, hSub, hAll⟩
   refine ⟨WCan.mkOfWorld Δ0 hWΔ0, ?hin, rfl⟩
-  -- show membership in Fcan
   change (WCan.mkOfWorld Δ0 hWΔ0).carrier ∈ Fset Γ.carrier A
   simpa using And.intro hWΔ0 (And.intro hSub hAll)
 
 /-! ## Truth Lemma (intuitionistic) -/
-
-/-- Mild Kripke blocking axiom for negation:
-    If `¬ₗ A ∈ Γ` and `Δ` extends `Γ`, then `A ∉ Δ`.
-
-    This captures exactly the upward-closure side of Kripke negation.
-    (You may prefer to move this to `Lindenbaum.lean`.) -/
-axiom neg_blocks
-  {Γ Δ : Set (Formula α)} (hΓ : World Γ) (hΔ : World Δ) (hsub : Γ ⊆ Δ) (A : Formula α) :
-  (¬ₗ A) ∈ Γ → A ∉ Δ
 
 /-- From `(A → B) ∈ Γ`, obtain `Fcan Γ A ⊆ tsetC B`. -/
 private lemma subset_of_imp_mem
@@ -108,11 +97,9 @@ private lemma subset_of_imp_mem
   (hImp : (A →ₗ B) ∈ Γ.carrier) :
   Fcan Γ A ⊆ tsetC B := by
   intro Δ hΔ
-  -- unpack Δ ∈ Fcan Γ A
   change Δ.carrier ∈ Fset Γ.carrier A at hΔ
   rcases hΔ with ⟨hWΔ, _hSub, hAll⟩
   have hBmem : B ∈ Δ.carrier := hAll B hImp
-  -- use IH for B
   have : SatC Δ B := (IH_B Δ).2 hBmem
   simpa [SatC] using this
 
@@ -124,10 +111,8 @@ private lemma imp_mem_of_subset
   (hsubset : Fcan Γ A ⊆ tsetC B) :
   (A →ₗ B) ∈ Γ.carrier := by
   by_contra hnot
-  -- witness Δ0 ∈ Fset Γ A with B ∉ Δ0
   rcases detachment_witness (Γ := Γ.carrier) (hW := Γ.world) (A := A) (B := B) hnot with
     ⟨Δ0, hΔ0in, hBnot⟩
-  -- package as canonical Δ and apply the subset hypothesis
   rcases mem_Fcan_of_Fset (Γ := Γ) (A := A) (Δ0 := Δ0) hΔ0in with ⟨Δ, hΔF, hcar⟩
   have hSat : SatC Δ B := hsubset hΔF
   have hBinΔ : B ∈ Δ.carrier := (IH_B Δ).1 hSat
@@ -147,19 +132,16 @@ private theorem truth_lemmaC_aux :
       simp
   | imp A B ihA ihB =>
       constructor
-      · -- (→) from subset to membership, using witness lemma
-        intro hSat
+      · intro hSat
         have hsubset : Fcan Γ A ⊆ tsetC B := (SatC_imp_iff_subset Γ A B).1 hSat
         exact imp_mem_of_subset (IH_B := ihB) Γ hsubset
-      · -- (←) from membership to subset, then fold back to SatC
-        intro hImp
+      · intro hImp
         have hsubset : Fcan Γ A ⊆ tsetC B := subset_of_imp_mem (IH_B := ihB) Γ hImp
         exact (SatC_imp_iff_subset Γ A B).2 hsubset
   | neg A ih =>
       constructor
       · -- (→) Kripke ⇒ membership using `neg_density` (contrapositive)
         intro hSat
-        -- Assume `¬ₗ A ∉ Γ`, obtain Δ ≥ Γ with `A ∈ Δ`, contradict hSat.
         have hWΓ := Γ.world
         by_contra hnot
         rcases neg_density (Γ₀ := Γ.carrier) (hW := hWΓ) (A := A) hnot with
@@ -173,10 +155,8 @@ private theorem truth_lemmaC_aux :
         intro hNegMem
         have hWΓ := Γ.world
         intro Δ hle
-        -- `neg_blocks` says: from `¬A ∈ Γ` and Γ ⊆ Δ, we get `A ∉ Δ`.
         have hnotAin : A ∉ Δ.carrier :=
           neg_blocks (hΓ := hWΓ) (hΔ := Δ.world) (hsub := hle) (A := A) hNegMem
-        -- By IH, `SatC Δ A ↔ A ∈ Δ`. So `SatC Δ A` is impossible.
         intro hSatA
         have : A ∈ Δ.carrier := (ih Δ).1 hSatA
         exact hnotAin this
@@ -200,16 +180,12 @@ private lemma GammaThm_closed : Closed (GammaThm : Set (Formula α)) := by
 theorem completenessC :
   ∀ A : Formula α, ValidC A → PS.Provable A := by
   intro A hvalid
-  by_contra _hnot  -- assume `A` not provable
-  -- extend the theorems set so that `¬A` holds
+  by_contra _hnot
   rcases extend_with_neg (Γ₀ := GammaThm) (hcl₀ := GammaThm_closed) A
     with ⟨Δ0, _hsub, hWΔ0, hNotA⟩
   let Δ : WCan α := ⟨Δ0, hWΔ0⟩
-  -- Validity says `Δ ⊨ A`
   have hA : SatC Δ A := hvalid Δ
-  -- Truth Lemma gives `Δ ⊨ ¬A` (from `¬A ∈ Δ`)
   have hNotA' : SatC Δ (¬ₗ A) := (truth_lemmaC (¬ₗ A) Δ).2 hNotA
-  -- But Kripke negation at Δ forbids Δ ⊨ A (take extension = Δ itself)
   have : ¬ SatC Δ A := (SatC_neg_iff Δ A).1 hNotA' Δ (leC_refl Δ)
   exact this hA
 
