@@ -7,10 +7,9 @@ This project is a vibe-specified, vibecoded attempt to solve this open problem. 
 The project consists of a semantics in Markdown+Latex which is at `ChatGPT_semantics.md`, and a Lean attempt to formalize it. At first, the project wrongly had classical negation. The current version is in the process of fixing this.
 
 Current project status (AFAICT):
-- `Language.lean` seems OK.
 - `Semantics.lean` seems OK. It is somewhat stronger than specified by `ChatGPT_semantics.md`, which should be edited later to reflect it.
-- `Soundness.lean` also seems accurate.
-- The files `ProofSystem.lean`, `Lindenbaum.lean`, and `Canonical.lean` are still as they were when I was wrongly assuming negation was classical in NL, so they are probably wrong.
+- `Language.lean`, `Soundness.lean` and `ProofSystem.lean` also seem accurate.
+- The files `Lindenbaum.lean` and `Canonical.lean` are still as they were when I was wrongly assuming negation was classical in NL, so they are probably wrong.
 - The files `Examples.lean`, `Utils.lean`, and `Main.lean` have also not been reviewed for compliance yet, but they are just scaffolding.
 
 Despite all the wrong files, the current build mysteriously compiles. It is still not ready, however.
