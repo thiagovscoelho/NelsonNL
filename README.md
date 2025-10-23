@@ -1,6 +1,6 @@
 # NelsonNL
 
-Providing a sound and complete semantics for NL is an open problem in connexive logic.
+“Providing a sound and complete semantics for NL is an open problem in connexive logic.” —Heinrich Wansing, [SEP](https://plato.stanford.edu/entries/logic-connexive/)
 
 This project is a vibe-specified, vibecoded attempt to solve it. I only began this because, when I threw the problem at ChatGPT for kicks, it spat out something that looked correct even to my math-understanding friends. Now I’m trying to finish it so as to give humanity a working semantics for these axioms.
 
