@@ -1,9 +1,10 @@
 /-
-NL — Canonical semantics, Truth Lemma, Completeness (no sorries).
+NL — Canonical semantics, Truth Lemma, Completeness (refactored into small lemmas).
 
 We keep the intended set-selection semantics in `Semantics.lean` for soundness.
 Here we introduce a *formula-indexed* canonical semantics that matches the
-standard textbook completeness proof (via Lindenbaum/World/Detachment).
+standard textbook completeness proof (via Lindenbaum/World/Detachment),
+but we factor the long proofs into short, reusable lemmas.
 -/
 import NL.Semantics
 import NL.ProofSystem
@@ -28,8 +29,8 @@ open ProofSystem
 /-! ## Canonical detachment, truth-sets, and satisfaction -/
 
 /-- Canonical detachment family (selection-on-formulas). -/
-def Fcan (WΓ : WCan α) (A : Formula α) : Set (WCan α) :=
-  { WΔ : WCan α | ∀ B : Formula α, (A →ₗ B) ∈ WΓ.carrier → B ∈ WΔ.carrier }
+def Fcan (Γ : WCan α) (A : Formula α) : Set (WCan α) :=
+  { Δ : WCan α | ∀ B : Formula α, (A →ₗ B) ∈ Γ.carrier → B ∈ Δ.carrier }
 
 /--
 Canonical truth-sets (formula-indexed):
@@ -38,95 +39,143 @@ Canonical truth-sets (formula-indexed):
 -/
 def tsetC (A : Formula α) : Set (WCan α) :=
   match A with
-  | .atom p   => { Ξ : WCan α | Formula.atom p ∈ Ξ.carrier }
-  | .conj A B => { Ξ : WCan α | (A ∧ₗ B) ∈ Ξ.carrier }
-  | .neg A    => { Ξ : WCan α | (¬ₗ A) ∈ Ξ.carrier }
-  | .imp A B  => { Ξ : WCan α | Fcan Ξ A ⊆ tsetC B }
-  | .circ A B => { Ξ : WCan α | (A ◦ B) ∈ Ξ.carrier }
+  | .atom p   => { Δ : WCan α | Formula.atom p ∈ Δ.carrier }
+  | .conj A B => { Δ : WCan α | (A ∧ₗ B) ∈ Δ.carrier }
+  | .neg A    => { Δ : WCan α | (¬ₗ A) ∈ Δ.carrier }
+  | .imp A B  => { Δ : WCan α | Fcan Δ A ⊆ tsetC B }
+  | .circ A B => { Δ : WCan α | (A ◦ B) ∈ Δ.carrier }
 
 /-- Canonical satisfaction. -/
-def SatC (WΓ : WCan α) (A : Formula α) : Prop := WΓ ∈ tsetC A
+def SatC (Γ : WCan α) (A : Formula α) : Prop := Γ ∈ tsetC A
 
 /-- Canonical validity. -/
-def ValidC (A : Formula α) : Prop := ∀ (WΓ : WCan α), SatC WΓ A
+def ValidC (A : Formula α) : Prop := ∀ (Γ : WCan α), SatC Γ A
+
+/-! ### Small simp facts that hide definitional noise -/
+
+@[simp] lemma SatC_atom_iff   (Γ : WCan α) (p) :
+  SatC Γ (.atom p) ↔ .atom p ∈ Γ.carrier := by
+  simp [SatC, tsetC]
+
+@[simp] lemma SatC_conj_iff   (Γ : WCan α) (A B) :
+  SatC Γ (A ∧ₗ B) ↔ (A ∧ₗ B) ∈ Γ.carrier := by
+  simp [SatC, tsetC]
+
+@[simp] lemma SatC_neg_iff    (Γ : WCan α) (A) :
+  SatC Γ (¬ₗ A) ↔ (¬ₗ A) ∈ Γ.carrier := by
+  simp [SatC, tsetC]
+
+@[simp] lemma SatC_circ_iff   (Γ : WCan α) (A B) :
+  SatC Γ (A ◦ B) ↔ (A ◦ B) ∈ Γ.carrier := by
+  simp [SatC, tsetC]
+
+@[simp] lemma SatC_imp_iff_subset (Γ : WCan α) (A B) :
+  SatC Γ (A →ₗ B) ↔ (Fcan Γ A ⊆ tsetC B) := by
+  simp [SatC, tsetC]
+
+/-! ### Tiny utilities to build WCan points out of `Fset` witnesses -/
+
+/-- Package a set of formulas with a `World` proof as a canonical world. -/
+@[simp] def WCan.mkOfWorld (Δ0 : Set (Formula α)) (hW : World Δ0) : WCan α := ⟨Δ0, hW⟩
+
+/-- From `Δ0 ∈ Fset Γ A`, produce a canonical `Δ : WCan α` in `Fcan Γ A`. -/
+lemma mem_Fcan_of_Fset
+  {Γ : WCan α} {A : Formula α} {Δ0 : Set (Formula α)}
+  (h : Δ0 ∈ Fset Γ.carrier A) :
+  ∃ Δ : WCan α, Δ ∈ Fcan Γ A ∧ Δ.carrier = Δ0 := by
+  rcases h with ⟨hWΔ0, hF⟩
+  refine ⟨WCan.mkOfWorld Δ0 hWΔ0, ?_, rfl⟩
+  intro B hAimpB
+  simpa using hF B hAimpB
+
+/-! ### The →-case helpers for the Truth Lemma -/
+
+/-- From `(A → B) ∈ Γ`, we get `Fcan Γ A ⊆ tsetC B`. -/
+private lemma subset_of_imp_mem
+  {A B : Formula α}
+  (IH_B : ∀ (Δ : WCan α), SatC Δ B ↔ B ∈ Δ.carrier)
+  (Γ : WCan α)
+  (hImp : (A →ₗ B) ∈ Γ.carrier) :
+  Fcan Γ A ⊆ tsetC B := by
+  intro Δ hΔ
+  have hBmem : B ∈ Δ.carrier := hΔ B hImp
+  have : SatC Δ B := (IH_B Δ).2 hBmem
+  simpa [SatC] using this
+
+/-- From `Fcan Γ A ⊆ tsetC B`, we get `(A → B) ∈ Γ` (using the detachment witness). -/
+private lemma imp_mem_of_subset
+  {A B : Formula α}
+  (IH_B : ∀ (Δ : WCan α), SatC Δ B ↔ B ∈ Δ.carrier)
+  (Γ : WCan α)
+  (hsubset : Fcan Γ A ⊆ tsetC B) :
+  (A →ₗ B) ∈ Γ.carrier := by
+  by_contra hnot
+  -- witness Δ0 ∈ Fset Γ A with B ∉ Δ0
+  rcases detachment_witness (Γ := Γ.carrier) (hW := Γ.world) (A := A) (B := B) hnot with
+    ⟨Δ0, hΔ0in, hBnot⟩
+  -- package as a canonical world Δ and use the subset hypothesis
+  rcases mem_Fcan_of_Fset (h := hΔ0in) with ⟨Δ, hΔF, hcar⟩
+  have hSat : SatC Δ B := hsubset hΔF
+  -- Truth lemma for B (IH) yields B ∈ Δ.carrier = Δ0, contradiction
+  have hBinΔ : B ∈ Δ.carrier := (IH_B Δ).1 hSat
+  have hBinΔ0 : B ∈ Δ0 := by simpa [hcar] using hBinΔ
+  exact hBnot hBinΔ0
 
 /-! ## Truth Lemma and Completeness -/
 
-/-- Auxiliary Truth Lemma generalized over an arbitrary set `G` with its `World` witness. -/
+/-- Auxiliary Truth Lemma over canonical worlds (ASCII identifiers only). -/
 private theorem truth_lemmaC_aux :
-  ∀ (A : Formula α) (G : Set (Formula α)) (hW : World G),
-    SatC ⟨G, hW⟩ A ↔ A ∈ G := by
+  ∀ (A : Formula α) (Γ : WCan α), SatC Γ A ↔ A ∈ Γ.carrier := by
   intro A
-  revert G hW
-  induction A with
+  induction A generalizing Γ with
   | atom p =>
-      intro G hW; simp [SatC, tsetC]
+      intro Γ; simpa
   | conj A B ihA ihB =>
-      intro G hW; simp [SatC, tsetC]
+      intro Γ; simpa
   | neg A ih =>
-      intro G hW; simp [SatC, tsetC]
+      intro Γ; simpa
   | imp A B ihA ihB =>
-      intro G hW
+      intro Γ
       constructor
-      · -- (⇒) assume `F_G(A) ⊆ [[B]]C`, prove `(A → B) ∈ G`
+      · -- (→) from subset to membership, using witness lemma
         intro hSat
-        have hsubset : Fcan ⟨G, hW⟩ A ⊆ tsetC B := by
-          simpa [SatC, tsetC] using hSat
-        by_contra hnot
-        -- detachment witness gives Δ with Δ ∈ F_G(A) and B ∉ Δ
-        rcases detachment_witness
-          (Γ := G) (hW := hW) (A := A) (B := B) hnot with
-          ⟨Δ, hΔin, hBnot⟩
-        rcases hΔin with ⟨hWΔ, hF⟩
-        let ΔW : WCan α := ⟨Δ, hWΔ⟩
-        have hΔW_F : ΔW ∈ Fcan ⟨G, hW⟩ A := by
-          -- unfold membership in `Fcan`
-          change ∀ B', (A →ₗ B') ∈ G → B' ∈ ΔW.carrier
-          intro B' hAimpB'
-          have : B' ∈ Δ := hF B' hAimpB'
-          simpa using this
-        have : SatC ΔW B := hsubset hΔW_F
-        have : B ∈ Δ :=
-          (truth_lemmaC_aux (A := B) (G := Δ) (hW := hWΔ)).1 this
-        exact hBnot this
-      · -- (⇐) assume `(A → B) ∈ G`, show `F_G(A) ⊆ [[B]]C`
+        have hsubset : Fcan Γ A ⊆ tsetC B := (SatC_imp_iff_subset Γ A B).1 hSat
+        exact imp_mem_of_subset (IH_B := ihB) Γ hsubset
+      · -- (←) from membership to subset, then fold back to SatC
         intro hImp
-        have : Fcan ⟨G, hW⟩ A ⊆ tsetC B := by
-          intro ΔW hΔW_F
-          have hB_in : B ∈ ΔW.carrier := hΔW_F B hImp
-          exact
-            (truth_lemmaC_aux (A := B)
-              (G := ΔW.carrier) (hW := ΔW.world)).2 hB_in
-        simpa [SatC, tsetC] using this
+        have hsubset : Fcan Γ A ⊆ tsetC B := subset_of_imp_mem (IH_B := ihB) Γ hImp
+        exact (SatC_imp_iff_subset Γ A B).2 hsubset
   | circ A B =>
-      intro G hW; simp [SatC, tsetC]
+      intro Γ; simpa
 
 /-- Truth Lemma for the canonical semantics. -/
 theorem truth_lemmaC :
-  ∀ (A : Formula α) (WΓ : WCan α), SatC WΓ A ↔ A ∈ WΓ.carrier := by
-  intro A WΓ
-  -- avoid destructuring; use the fields directly and `simpa`
-  simpa using
-    (truth_lemmaC_aux (A := A) (G := WΓ.carrier) (hW := WΓ.world))
+  ∀ (A : Formula α) (Γ : WCan α), SatC Γ A ↔ A ∈ Γ.carrier := by
+  intro A Γ
+  exact truth_lemmaC_aux A Γ
+
+/-! ### Completeness (split into tiny helpers) -/
+
+private def GammaThm : Set (Formula α) := fun B => PS.Provable B
+
+private lemma GammaThm_closed : Closed (GammaThm : Set (Formula α)) := by
+  refine ⟨?thm, ?mp, ?adj⟩
+  · intro B hPB; exact hPB
+  · intro B C hB hBC; exact PS.mp hB hBC
+  · intro B C hB hC;  exact PS.adj hB hC
 
 /-- Canonical validity implies provability (strong completeness). -/
 theorem completenessC :
   ∀ A : Formula α, ValidC A → PS.Provable A := by
   intro A hvalid
-  by_contra hnot
-  -- closed set of theorems
-  let Γthm : Set (Formula α) := fun B => PS.Provable B
-  have hcl : Closed Γthm := by
-    refine ⟨?thm, ?mp, ?adj⟩
-    · intro B hPB; exact hPB
-    · intro B C hB hBC; exact PS.mp hB hBC
-    · intro B C hB hC; exact PS.adj hB hC
-  -- extend by ¬A
-  rcases extend_with_neg (Γ₀ := Γthm) hcl A with ⟨Δ, _hsub, hWΔ, hNotA⟩
-  let ΔW : WCan α := ⟨Δ, hWΔ⟩
-  -- validity gives SatC ΔW A; Truth Lemma gives A ∈ Δ; exclusivity contradicts ¬A ∈ Δ
-  have : SatC ΔW A := hvalid ΔW
-  have : A ∈ Δ := (truth_lemmaC A ΔW).1 this
-  exact (hWΔ.neg_exclusive A) ⟨this, hNotA⟩
+  by_contra _hnot  -- assumption not used explicitly
+  -- extend the theorems set by ¬A
+  rcases extend_with_neg (Γ₀ := GammaThm) (hcl₀ := GammaThm_closed) A
+    with ⟨Δ0, _hsub, hWΔ0, hNotA⟩
+  let Δ : WCan α := ⟨Δ0, hWΔ0⟩
+  -- validity says SatC Δ A; Truth Lemma gives A ∈ Δ0; exclusivity contradicts ¬A ∈ Δ0
+  have : SatC Δ A := hvalid Δ
+  have : A ∈ Δ0 := (truth_lemmaC A Δ).1 this
+  exact (hWΔ0.neg_exclusive A) ⟨this, hNotA⟩
 
 end NL
