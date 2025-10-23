@@ -88,6 +88,13 @@ lemma mem_Fcan_of_Fset
   intro B hAimpB
   simpa using hF B hAimpB
 
+/-- **Explicit-argument** version to avoid implicit inference of `Γ` at call sites. -/
+lemma mem_Fcan_of_Fset'
+  (Γ : WCan α) (A : Formula α) {Δ0 : Set (Formula α)}
+  (h : Δ0 ∈ Fset Γ.carrier A) :
+  ∃ Δ : WCan α, Δ ∈ Fcan Γ A ∧ Δ.carrier = Δ0 :=
+  mem_Fcan_of_Fset (Γ := Γ) (A := A) (Δ0 := Δ0) h
+
 /-! ### The →-case helpers for the Truth Lemma -/
 
 /-- From `(A → B) ∈ Γ`, we get `Fcan Γ A ⊆ tsetC B`. -/
@@ -114,7 +121,7 @@ private lemma imp_mem_of_subset
   rcases detachment_witness (Γ := Γ.carrier) (hW := Γ.world) (A := A) (B := B) hnot with
     ⟨Δ0, hΔ0in, hBnot⟩
   -- package as a canonical world Δ and use the subset hypothesis
-  rcases mem_Fcan_of_Fset (h := hΔ0in) with ⟨Δ, hΔF, hcar⟩
+  rcases mem_Fcan_of_Fset' Γ A hΔ0in with ⟨Δ, hΔF, hcar⟩
   have hSat : SatC Δ B := hsubset hΔF
   -- Truth lemma for B (IH) yields B ∈ Δ.carrier = Δ0, contradiction
   have hBinΔ : B ∈ Δ.carrier := (IH_B Δ).1 hSat
@@ -126,16 +133,15 @@ private lemma imp_mem_of_subset
 /-- Auxiliary Truth Lemma over canonical worlds (ASCII identifiers only). -/
 private theorem truth_lemmaC_aux :
   ∀ (A : Formula α) (Γ : WCan α), SatC Γ A ↔ A ∈ Γ.carrier := by
-  intro A
+  intro A Γ
   induction A generalizing Γ with
   | atom p =>
-      intro Γ; simpa
+      simp
   | conj A B ihA ihB =>
-      intro Γ; simpa
+      simp
   | neg A ih =>
-      intro Γ; simpa
+      simp
   | imp A B ihA ihB =>
-      intro Γ
       constructor
       · -- (→) from subset to membership, using witness lemma
         intro hSat
@@ -146,7 +152,7 @@ private theorem truth_lemmaC_aux :
         have hsubset : Fcan Γ A ⊆ tsetC B := subset_of_imp_mem (IH_B := ihB) Γ hImp
         exact (SatC_imp_iff_subset Γ A B).2 hsubset
   | circ A B =>
-      intro Γ; simpa
+      simp
 
 /-- Truth Lemma for the canonical semantics. -/
 theorem truth_lemmaC :
