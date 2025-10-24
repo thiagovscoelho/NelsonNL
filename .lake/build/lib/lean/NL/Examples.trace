@@ -1,19 +1,33 @@
 {"synthetic": false,
  "outputs":
- {"o": ["11624640455808955222"],
-  "i": "16003366132044493625",
-  "c": "8612707447517414661"},
+ {"o": ["17342603583620834439"],
+  "i": "7142571589648184141",
+  "c": "2024813188597357820"},
  "log":
  [{"message":
    ".> LEAN_PATH=C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\Cli\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\batteries\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\Qq\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\aesop\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\proofwidgets\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\importGraph\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\LeanSearchClient\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\plausible\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\mathlib\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean c:\\Users\\Thiago\\.elan\\toolchains\\leanprover--lean4---v4.24.0\\bin\\lean.exe C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Examples.lean -o C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\Examples.olean -i C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\Examples.ilean -c C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\ir\\NL\\Examples.c --setup C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\ir\\NL\\Examples.setup.json --json",
-   "level": "trace"}],
+   "level": "trace"},
+  {"message":
+   "NL/Examples.lean:66:0: NL.ax_1_7_valid.{u, v} {α : Type u} (A B C : Formula α) : Model.Valid ((A ∧ₗ B →ₗ C) →ₗ A ∧ₗ ¬ₗC →ₗ ¬ₗB)",
+   "level": "info"},
+  {"message":
+   "NL/Examples.lean:67:0: NL.ax_1_5_valid.{u, v} {α : Type u} (A B C : Formula α) : Model.Valid ((A ≠ₗ B ≠ₗ C) →ₗ (A →ₗ B) ∧ₗ (B →ₗ C) →ₗ A →ₗ C)",
+   "level": "info"},
+  {"message":
+   "NL/Examples.lean:68:0: NL.mp_at.{u, v} {α : Type u} {A B : Formula α} (M : Model α) (w : M.W) : M.Sat w A → M.Sat w (A →ₗ B) → M.Sat w B",
+   "level": "info"},
+  {"message":
+   "NL/Examples.lean:69:0: NL.rule_R2_sound.{u, v} {α : Type u} (A B : Formula α) (hA : Model.Valid A) (hB : Model.Valid B) : Model.Valid (A ∧ₗ B)",
+   "level": "info"}],
  "inputs":
  [["NL.Examples:deps",
    [["deps",
      [["NelsonNL/NL:extraDep", [["@NelsonNL:extraDep", "1723"]]],
       ["imports",
        [["NL.Semantics transitive imports (legacy)", "8278479427972197967"],
-        ["NL.Semantics:importAllArts", "324828957583899377"]]]]],
+        ["NL.Semantics:importAllArts", "324828957583899377"],
+        ["NL.Soundness transitive imports (legacy)", "8341844825399645028"],
+        ["NL.Soundness:importAllArts", "5931571962002840460"]]]]],
     ["libs",
      [["import dynlibs", "1723"],
       ["package external libraries", "1723"],
@@ -22,7 +36,7 @@
   ["Lean 4.24.0, commit 797c613eb9b6d4ec95db23e3e00af9ac6657f24b",
    "1165570713881806064"],
   ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Examples.lean",
-   "5650553220622156137"],
+   "14063122414272490529"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "12569013214847649232"}
+ "depHash": "15424598638702272276"}

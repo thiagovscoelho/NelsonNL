@@ -14,8 +14,8 @@
       ["imports",
        [["NL.Canonical transitive imports (legacy)", "15873971481286485984"],
         ["NL.Canonical:importAllArts", "15194775215623137996"],
-        ["NL.Examples transitive imports (legacy)", "8341844825399645028"],
-        ["NL.Examples:importAllArts", "14229338120272894237"],
+        ["NL.Examples transitive imports (legacy)", "17155088053278028093"],
+        ["NL.Examples:importAllArts", "10636969328330929461"],
         ["NL.Language transitive imports (legacy)", "1723"],
         ["NL.Language:importAllArts", "13841876752982759957"],
         ["NL.Lindenbaum transitive imports (legacy)", "3301485513107125557"],
@@ -39,4 +39,4 @@
    "2151785428250520458"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "15040928604496299497"}
+ "depHash": "16745319070933193572"}
