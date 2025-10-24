@@ -1,0 +1,10 @@
+{"plugins": [],
+ "options": {},
+ "name": "NL.ImpCongr",
+ "isModule": false,
+ "importArts":
+ {"NL.ProofSystem":
+  ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\ProofSystem.olean"],
+  "NL.Language":
+  ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\Language.olean"]},
+ "dynlibs": []}

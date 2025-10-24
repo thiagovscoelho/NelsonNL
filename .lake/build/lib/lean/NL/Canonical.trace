@@ -1,8 +1,8 @@
 {"synthetic": false,
  "outputs":
- {"o": ["3010807204516125585"],
-  "i": "7703413186014617634",
-  "c": "17279548836210351292"},
+ {"o": ["10594957674924661792"],
+  "i": "12121193703647477240",
+  "c": "3522615834919134807"},
  "log":
  [{"message":
    ".> LEAN_PATH=C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\Cli\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\batteries\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\Qq\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\aesop\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\proofwidgets\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\importGraph\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\LeanSearchClient\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\plausible\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\packages\\mathlib\\.lake\\build\\lib\\lean;C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean c:\\Users\\Thiago\\.elan\\toolchains\\leanprover--lean4---v4.24.0\\bin\\lean.exe C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Canonical.lean -o C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\Canonical.olean -i C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\lib\\lean\\NL\\Canonical.ilean -c C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\ir\\NL\\Canonical.c --setup C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\.lake\\build\\ir\\NL\\Canonical.setup.json --json",
@@ -16,8 +16,10 @@
         ["NL.Semantics:importAllArts", "324828957583899377"],
         ["NL.ProofSystem transitive imports (legacy)", "17686458983870144006"],
         ["NL.ProofSystem:importAllArts", "12223027573280370676"],
-        ["NL.Lindenbaum transitive imports (legacy)", "3301485513107125557"],
-        ["NL.Lindenbaum:importAllArts", "4457946917810270329"]]]]],
+        ["NL.ImpCongr transitive imports (legacy)", "14868549384192956842"],
+        ["NL.ImpCongr:importAllArts", "12248533395201841576"],
+        ["NL.Lindenbaum transitive imports (legacy)", "14129401413219277010"],
+        ["NL.Lindenbaum:importAllArts", "11709406286165226526"]]]]],
     ["libs",
      [["import dynlibs", "1723"],
       ["package external libraries", "1723"],
@@ -26,7 +28,7 @@
   ["Lean 4.24.0, commit 797c613eb9b6d4ec95db23e3e00af9ac6657f24b",
    "1165570713881806064"],
   ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Canonical.lean",
-   "5435020491381067045"],
+   "5662665653468310674"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "13697966629469764427"}
+ "depHash": "17073420149726909962"}

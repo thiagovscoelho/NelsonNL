@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: NL.Canonical
-// Imports: Init NL.Semantics NL.ProofSystem NL.Lindenbaum
+// Imports: Init NL.Semantics NL.ProofSystem NL.ImpCongr NL.Lindenbaum
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -122,6 +122,7 @@ return x_5;
 lean_object* initialize_Init(uint8_t builtin, lean_object*);
 lean_object* initialize_NL_Semantics(uint8_t builtin, lean_object*);
 lean_object* initialize_NL_ProofSystem(uint8_t builtin, lean_object*);
+lean_object* initialize_NL_ImpCongr(uint8_t builtin, lean_object*);
 lean_object* initialize_NL_Lindenbaum(uint8_t builtin, lean_object*);
 static bool _G_initialized = false;
 LEAN_EXPORT lean_object* initialize_NL_Canonical(uint8_t builtin, lean_object* w) {
@@ -135,6 +136,9 @@ res = initialize_NL_Semantics(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_NL_ProofSystem(builtin, lean_io_mk_world());
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_NL_ImpCongr(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_NL_Lindenbaum(builtin, lean_io_mk_world());

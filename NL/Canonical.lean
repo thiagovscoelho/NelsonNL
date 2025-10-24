@@ -7,6 +7,7 @@ NL — Canonical semantics, Truth Lemma, Completeness (intuitionistic version)
 -/
 import NL.Semantics
 import NL.ProofSystem
+import NL.ImpCongr
 import NL.Lindenbaum
 
 open Classical Set
@@ -217,5 +218,42 @@ by
     exact fun h => provable_validC A h
 
 end Adequacy
+
+
+open ProofSystem
+
+-- Extensionality of `Fcan` (depends on `Fset` extensionality proved in Lindenbaum)
+section Extensionality
+
+variable {α : Type _}
+variable [PS : ProofSystem.NLProofSystem α]
+variable [ProofSystem.HasImpCongrLeft α]
+
+/-- If `PS.Provable (A =ₗ A')`, then `Fcan Γ A = Fcan Γ A'` for every canonical `Γ`. -/
+lemma Fcan_extensional (Γ : WCan α) {A A' : Formula α}
+  (hAA' : PS.Provable (A =ₗ A')) :
+  Fcan Γ A = Fcan Γ A' := by
+  -- Work elementwise; rewrite memberships to the underlying Fset
+  apply Set.ext
+  intro Δ
+  constructor
+  · intro h
+    -- h : Δ ∈ Fcan Γ A
+    change Δ.carrier ∈ Fset Γ.carrier A at h
+    -- goal: Δ ∈ Fcan Γ A'
+    change Δ.carrier ∈ Fset Γ.carrier A'
+    have hF := NL.Extensionality.Fset_extensional
+                 (α := α) (hW := Γ.world) (A := A) (A' := A') hAA'
+    simpa [hF] using h
+  · intro h
+    -- h : Δ ∈ Fcan Γ A'
+    change Δ.carrier ∈ Fset Γ.carrier A' at h
+    -- goal: Δ ∈ Fcan Γ A
+    change Δ.carrier ∈ Fset Γ.carrier A
+    have hF := NL.Extensionality.Fset_extensional
+                 (α := α) (hW := Γ.world) (A := A) (A' := A') hAA'
+    simpa [hF] using h
+
+end Extensionality
 
 end NL

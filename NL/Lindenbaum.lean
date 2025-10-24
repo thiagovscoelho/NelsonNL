@@ -7,6 +7,7 @@ monotone/extension principles needed for the canonical model with Kripke negatio
 
 import NL.Semantics
 import NL.ProofSystem
+import NL.ImpCongr
 
 open Classical Set
 
@@ -88,5 +89,47 @@ axiom F_nonempty {Γ : Set (Formula α)} (hW : World Γ) (A : Formula α) :
 axiom detachment_witness
   {Γ : Set (Formula α)} (hW : World Γ) {A B : Formula α} :
   (A →ₗ B) ∉ Γ → ∃ Δ ∈ Fset Γ A, B ∉ Δ
+
+/-
+Extensionality of the canonical detachment family Fset:
+if A =ₗ A' is provable, then Fset Γ A = Fset Γ A'.
+-/
+namespace Extensionality
+
+open ProofSystem
+
+variable {α : Type _}
+variable [PS : ProofSystem.NLProofSystem α]
+variable [ProofSystem.HasImpCongrLeft α]
+
+/-- If `PS.Provable (A =ₗ A')`, then `Fset Γ A = Fset Γ A'`. -/
+lemma Fset_extensional
+  {Γ : Set (Formula α)} (hW : World Γ) {A A' : Formula α}
+  (hAA' : PS.Provable (A =ₗ A')) :
+  Fset Γ A = Fset Γ A' := by
+  apply Set.ext
+  intro Δ; constructor <;> intro hΔ
+  · -- →: turn a witness for A into one for A'
+    rcases hΔ with ⟨hWΔ, hSub, hAll⟩
+    refine ⟨hWΔ, hSub, ?_⟩
+    intro B hA'B
+    -- Use the provable direction (A'→B) → (A→B), add it to Γ, and MP
+    have ⟨_, hA'toA⟩ :=
+      ProofSystem.HasImpCongrLeft.imp_congr_left (α := α) (A := A) (A' := A') (B := B) hAA'
+    have hInΓ : ((A' →ₗ B) →ₗ (A →ₗ B)) ∈ Γ := (World.thm hW) hA'toA
+    have hAB : (A →ₗ B) ∈ Γ := hW.mp hA'B hInΓ
+    exact hAll B hAB
+  · -- ←: symmetric
+    rcases hΔ with ⟨hWΔ, hSub, hAll⟩
+    refine ⟨hWΔ, hSub, ?_⟩
+    intro B hAB
+    -- Use the provable direction (A→B) → (A'→B)
+    have ⟨hAtoA', _⟩ :=
+      ProofSystem.HasImpCongrLeft.imp_congr_left (α := α) (A := A) (A' := A') (B := B) hAA'
+    have hInΓ : ((A →ₗ B) →ₗ (A' →ₗ B)) ∈ Γ := (World.thm hW) hAtoA'
+    have hA'B : (A' →ₗ B) ∈ Γ := hW.mp hAB hInΓ
+    exact hAll B hA'B
+
+end Extensionality
 
 end NL
