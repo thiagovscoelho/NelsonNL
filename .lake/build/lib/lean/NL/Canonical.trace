@@ -1,7 +1,7 @@
 {"synthetic": false,
  "outputs":
- {"o": ["14607150353183726028"],
-  "i": "16081367701639584243",
+ {"o": ["3010807204516125585"],
+  "i": "7703413186014617634",
   "c": "17279548836210351292"},
  "log":
  [{"message":
@@ -26,7 +26,7 @@
   ["Lean 4.24.0, commit 797c613eb9b6d4ec95db23e3e00af9ac6657f24b",
    "1165570713881806064"],
   ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Canonical.lean",
-   "7295596300827857309"],
+   "5435020491381067045"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "558384621183187110"}
+ "depHash": "13697966629469764427"}

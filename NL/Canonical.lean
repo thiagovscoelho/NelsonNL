@@ -189,4 +189,33 @@ theorem completenessC :
   have : ¬ SatC Δ A := (SatC_neg_iff Δ A).1 hNotA' Δ (leC_refl Δ)
   exact this hA
 
+/-! ## Adequacy: canonical validity ⇔ provability -/
+
+section Adequacy
+
+variable {α : Type _}
+variable [PS : ProofSystem.NLProofSystem α]
+open ProofSystem
+
+/-- Every theorem holds in every canonical world (hence is canonically valid). -/
+theorem provable_validC (A : Formula α) :
+  PS.Provable A → ValidC A := by
+  intro hA Γ
+  -- Theorems belong to every world Γ…
+  have hmem : A ∈ Γ.carrier := (World.thm (Γ.world) hA)
+  -- …and Truth Lemma turns membership into satisfaction.
+  exact (truth_lemmaC A Γ).2 hmem
+
+/-- Canonical adequacy: canonical validity if and only if provability. -/
+theorem validC_iff_provable (A : Formula α) :
+  ValidC A ↔ PS.Provable A :=
+by
+  constructor
+  · -- completeness (already proved)
+    exact fun h => completenessC A h
+  · -- sound direction into canonical semantics
+    exact fun h => provable_validC A h
+
+end Adequacy
+
 end NL
