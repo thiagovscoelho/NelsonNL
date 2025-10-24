@@ -256,4 +256,53 @@ lemma Fcan_extensional (Γ : WCan α) {A A' : Formula α}
 
 end Extensionality
 
+/-- ### Helpers for the canonical selection
+
+Fcan Γ A ⊆ [[A]]: follows from axiom 1.1 in Γ (A → A) and `World.mp`. -/
+lemma Fcan_subset_A {α} [PS : ProofSystem.NLProofSystem α]
+  (Γ : WCan α) (A : Formula α) :
+  Fcan Γ A ⊆ tsetC A := by
+  intro Δ hΔ
+  -- Δ ∈ Fcan Γ A means: Δ.carrier ∈ Fset Γ.carrier A
+  change Δ.carrier ∈ Fset Γ.carrier A at hΔ
+  rcases hΔ with ⟨hWΔ, hSub, hAll⟩
+  -- axiom 1.1 : (A → A) ∈ Γ
+  have hAA : (A →ₗ A) ∈ Γ.carrier := (World.thm Γ.world) (PS.ax11 A)
+  -- then B := A gives A ∈ Δ
+  have hAinΔ : A ∈ Δ.carrier := hAll A hAA
+  -- Truth Lemma: membership ↔ canonical truth
+  exact (truth_lemmaC A Δ).2 hAinΔ
+
+/-- Base monotonicity: if Γ ≤ Γ' then Fcan Γ' A ⊆ Fcan Γ A. -/
+lemma Fcan_mono_base {α} [PS : ProofSystem.NLProofSystem α]
+  {Γ Γ' : WCan α} (hle : leC Γ Γ') (A : Formula α) :
+  Fcan Γ' A ⊆ Fcan Γ A := by
+  intro Δ hΔ
+  change Δ.carrier ∈ Fset Γ'.carrier A at hΔ
+  rcases hΔ with ⟨hWΔ, hSub', hAll'⟩
+  -- Γ ⊆ Γ' ⊆ Δ
+  have hSub : Γ.carrier ⊆ Δ.carrier :=
+    Set.Subset.trans hle hSub'
+  -- obligations for Fset Γ A
+  refine ?goal
+  change Δ.carrier ∈ Fset Γ.carrier A
+  refine And.intro hWΔ (And.intro hSub ?_)
+  intro B hAB
+  -- If (A→B) ∈ Γ, then (A→B) ∈ Γ' by inclusion, then B ∈ Δ by hAll'
+  have hAB' : (A →ₗ B) ∈ Γ'.carrier := hle hAB
+  exact hAll' B hAB'
+
+/-- If Γ ⊨ A, then Γ ∈ Fcan Γ A. -/
+lemma self_in_Fcan_if_A {α} [PS : ProofSystem.NLProofSystem α]
+  (Γ : WCan α) (A : Formula α)
+  (hA : SatC Γ A) : Γ ∈ Fcan Γ A := by
+  -- We need Γ.carrier ∈ Fset Γ.carrier A
+  have hA' : A ∈ Γ.carrier := (truth_lemmaC A Γ).1 hA
+  have hWΓ := Γ.world
+  change Γ.carrier ∈ Fset Γ.carrier A
+  refine And.intro hWΓ (And.intro (by intro φ h; exact h) ?_)
+  intro B hAB
+  -- With A ∈ Γ and (A→B) ∈ Γ, closure under MP yields B ∈ Γ.
+  exact (World.mp Γ.world) hA' hAB
+
 end NL

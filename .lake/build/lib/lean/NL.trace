@@ -13,7 +13,7 @@
      [["NelsonNL/NL:extraDep", [["@NelsonNL:extraDep", "1723"]]],
       ["imports",
        [["NL.Canonical transitive imports (legacy)", "1814944503860823100"],
-        ["NL.Canonical:importAllArts", "4745982207583398239"],
+        ["NL.Canonical:importAllArts", "2388193504734458646"],
         ["NL.Examples transitive imports (legacy)", "17155088053278028093"],
         ["NL.Examples:importAllArts", "10636969328330929461"],
         ["NL.Language transitive imports (legacy)", "1723"],
@@ -39,4 +39,4 @@
    "2151785428250520458"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "6234949815651958226"}
+ "depHash": "3486169191731126842"}
