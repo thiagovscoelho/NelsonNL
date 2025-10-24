@@ -1,7 +1,7 @@
 {"synthetic": false,
  "outputs":
- {"o": ["203830751496115138"],
-  "i": "697346835171849299",
+ {"o": ["13944597549229871422"],
+  "i": "7592386598287053769",
   "c": "6656386924101319585"},
  "log":
  [{"message":
@@ -13,7 +13,7 @@
      [["NelsonNL/NL:extraDep", [["@NelsonNL:extraDep", "1723"]]],
       ["imports",
        [["NL.Semantics transitive imports (legacy)", "8278479427972197967"],
-        ["NL.Semantics:importAllArts", "2970129009743347344"]]]]],
+        ["NL.Semantics:importAllArts", "324828957583899377"]]]]],
     ["libs",
      [["import dynlibs", "1723"],
       ["package external libraries", "1723"],
@@ -22,7 +22,7 @@
   ["Lean 4.24.0, commit 797c613eb9b6d4ec95db23e3e00af9ac6657f24b",
    "1165570713881806064"],
   ["C:\\Users\\Thiago\\Documents\\Thiago\\Programas\\Documents\\Programming\\NelsonNL\\NelsonNL\\NL\\Soundness.lean",
-   "12624879276866035106"],
+   "14609313509682115810"],
   ["options", "1723"],
   ["Module.leanArgs: #[]", "1723"]],
- "depHash": "9182043009458442857"}
+ "depHash": "923910979561655109"}

@@ -127,35 +127,82 @@ theorem rule_R2_sound (A B : Formula α)
   intro M w
   exact And.intro (hA M w) (hB M w)
 
-/-! ### 1.5 via Cut (stronger than needed, but implies the guarded axiom) -/
+-- in NL.Soundness
 
-/-- Unconditional hypothetical syllogism is valid on frames with `Cut`. -/
-theorem hs_valid (A B C : Formula α) :
-    Model.Valid.{u, v} (((A →ₗ B) ∧ₗ (B →ₗ C)) →ₗ (A →ₗ C)) := by
-  intro M w
-  change M.frame.f w (M.tset ((A →ₗ B) ∧ₗ (B →ₗ C))) ⊆ M.tset (A →ₗ C)
-  intro v' hv
-  -- From membership in f_w antecedent, get the antecedent itself at v'
-  have hv0 : v' ∈ M.tset (A →ₗ B) ∧ v' ∈ M.tset (B →ₗ C) := by
-    simpa [Model.tset] using
-      (M.frame.Id w (M.tset ((A →ₗ B) ∧ₗ (B →ₗ C))) hv)
-  -- Use Cut at world v'
-  have hAB : M.frame.f v' (M.tset A) ⊆ M.tset B := by simpa [Model.tset] using hv0.left
-  have hBC : M.frame.f v' (M.tset B) ⊆ M.tset C := by simpa [Model.tset] using hv0.right
-  have hAC : M.frame.f v' (M.tset A) ⊆ M.tset C :=
-    M.frame.Cut v' (M.tset A) (M.tset B) (M.tset C) hAB hBC
-  simpa [Model.tset] using hAC
+/-- If `u ⊨ ¬((A→B) ∧ (B→A))`, then at `u` we do **not** have local equivalence
+    `f_u ⟦A⟧ ⊆ ⟦B⟧` and `f_u ⟦B⟧ ⊆ ⟦A⟧`. -/
+private lemma not_equiv_at_of_negEq
+  {α : Type u} {M : Model α} {u : M.W} {A B : Formula α} :
+  u ∈ M.tset (¬ₗ ((A →ₗ B) ∧ₗ (B →ₗ A))) →
+  ¬ ((M.frame.f u (M.tset A) ⊆ M.tset B) ∧ (M.frame.f u (M.tset B) ⊆ M.tset A)) := by
+  intro hneg hboth
+  -- From both inclusions we get membership in `(A→B) ∧ (B→A)` at `u`
+  have hu_eq : u ∈ M.tset ((A →ₗ B) ∧ₗ (B →ₗ A)) := by
+    simp [Set.subset_def] at hboth
+    -- expand: having each inclusion at `u` is exactly forcing each implication at `u`
+    -- so we can just rewrite:
+    simpa [Model.tset] using And.intro hboth.left hboth.right
+  -- But `¬` says no ≥-extension of `u` can have that; in particular `u` itself.
+  have : u ∉ M.tset ((A →ₗ B) ∧ₗ (B →ₗ A)) :=
+    hneg u (M.frame.le_refl u)
+  exact this hu_eq
 
-/-- 1.5 in its **guarded** form now follows immediately from `hs_valid`. -/
+/-- 1.5  Guarded HS without `Cut`. -/
 theorem ax_1_5_valid (A B C : Formula α) :
     Model.Valid.{u, v}
       ((Formula.neq3 A B C) →ₗ (((A →ₗ B) ∧ₗ (B →ₗ C)) →ₗ (A →ₗ C))) := by
   intro M w
+  -- Outer implication: step to a world `v` selected by `f_w` on the guard
   change M.frame.f w (M.tset (Formula.neq3 A B C)) ⊆
          M.tset (((A →ₗ B) ∧ₗ (B →ₗ C)) →ₗ (A →ₗ C))
-  -- The consequent is valid everywhere by `hs_valid`, so the inclusion is immediate.
-  intro v' _hv
-  exact (hs_valid (α := α) (A := A) (B := B) (C := C)) M v'
+  intro v hv
+  -- From Id, `v` actually satisfies the guard conjuncts
+  have hv_guard : v ∈ M.tset (Formula.neq3 A B C) :=
+    (M.frame.Id w (M.tset (Formula.neq3 A B C))) hv
+
+  -- Write out the three guarded negations at `v`
+  -- `neq3` abbreviates `(A≠B) ∧ (B≠C) ∧ (A≠C)` and `X≠Y` is `¬((X→Y) ∧ (Y→X))`
+  rcases hv_guard with ⟨hABne_v, hBCne_v, hACne_v⟩
+
+  -- Now show: at `v`, `((A→B) ∧ (B→C)) → (A→C)`
+  change M.frame.f v (M.tset ((A →ₗ B) ∧ₗ (B →ₗ C))) ⊆ M.tset (A →ₗ C)
+  intro u hu
+  -- `u` is the inner selection point; first, push the guard up to `u` using `f_up` + persistence
+  have hvu : M.frame.le v u := M.frame.f_up (X := M.tset ((A →ₗ B) ∧ₗ (B →ₗ C))) hu
+  have hABne_u : u ∈ M.tset (¬ₗ ((A →ₗ B) ∧ₗ (B →ₗ A))) :=
+    (persist M (¬ₗ ((A →ₗ B) ∧ₗ (B →ₗ A))) hABne_v hvu)
+  have hBCne_u : u ∈ M.tset (¬ₗ ((B →ₗ C) ∧ₗ (C →ₗ B))) :=
+    (persist M (¬ₗ ((B →ₗ C) ∧ₗ (C →ₗ B))) hBCne_v hvu)
+  have hACne_u : u ∈ M.tset (¬ₗ ((A →ₗ C) ∧ₗ (C →ₗ A))) :=
+    (persist M (¬ₗ ((A →ₗ C) ∧ₗ (C →ₗ A))) hACne_v hvu)
+
+  -- From membership of the antecedent at `u` we read off the two inclusions at `u`
+  have hu_AB_BC : u ∈ M.tset (A →ₗ B) ∧ u ∈ M.tset (B →ₗ C) := by
+    simpa [Model.tset] using
+      (M.frame.Id v (M.tset ((A →ₗ B) ∧ₗ (B →ₗ C))) hu)
+  have hAB_u : M.frame.f u (M.tset A) ⊆ M.tset B := by
+    simpa [Model.tset] using hu_AB_BC.left
+  have hBC_u : M.frame.f u (M.tset B) ⊆ M.tset C := by
+    simpa [Model.tset] using hu_AB_BC.right
+
+  -- The three local non-equivalences at `u`
+  have hNeq_AB_u :
+    ¬ ((M.frame.f u (M.tset A) ⊆ M.tset B) ∧ (M.frame.f u (M.tset B) ⊆ M.tset A)) :=
+    not_equiv_at_of_negEq (M := M) (u := u) (A := A) (B := B) hABne_u
+  have hNeq_BC_u :
+    ¬ ((M.frame.f u (M.tset B) ⊆ M.tset C) ∧ (M.frame.f u (M.tset C) ⊆ M.tset B)) :=
+    not_equiv_at_of_negEq (M := M) (u := u) (A := B) (B := C) hBCne_u
+  have hNeq_AC_u :
+    ¬ ((M.frame.f u (M.tset A) ⊆ M.tset C) ∧ (M.frame.f u (M.tset C) ⊆ M.tset A)) :=
+    not_equiv_at_of_negEq (M := M) (u := u) (A := A) (B := C) hACne_u
+
+  -- Apply the guarded frame law **at u**
+  have hAC_u : M.frame.f u (M.tset A) ⊆ M.tset C :=
+    M.frame.TrNeq u (M.tset A) (M.tset B) (M.tset C)
+      hNeq_AB_u hNeq_BC_u hNeq_AC_u hAB_u hBC_u
+
+  -- Conclude `u ⊨ A→C`
+  simpa [Model.tset] using hAC_u
 
 end Soundness
 

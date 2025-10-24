@@ -35,27 +35,40 @@ The fields encode the NL frame conditions from the spec:
 `C_her` so that `◦` is upward persistent; and `Cut` (Hypothetical Syllogism),
 which immediately validates axiom 1.5 (stronger than the guarded version, but compatible with NL).
 -/
+-- in NL.Semantics
+
 structure Frame (W : Type v) where
   -- Intuitionistic accessibility
   le       : W → W → Prop
   le_refl  : ∀ w, le w w
   le_trans : ∀ {w x y}, le w x → le x y → le w y
+
   -- Semantics of → and ◦
   f        : W → Set W → Set W
   C        : W → Set W → Set W → Prop
+
   -- Conditional laws
   Id       : ∀ (w : W) (X : Set W), f w X ⊆ X
   Her      : ∀ {w x : W} (X : Set W), le w x → f x X ⊆ f w X
   Succ     : ∀ (w : W) (X : Set W), w ∈ X → w ∈ f w X
   Contra   : ∀ (w : W) (X Y Z : Set W),
                f w (X ∩ Y) ⊆ Z → f w (X ∩ iNeg le Z) ⊆ iNeg le Y
+
+  -- NEW: the selections stay above the current world
+  f_up     : ∀ {w x : W} {X : Set W}, x ∈ f w X → le w x
+
   -- Compatibility laws
   C_symm   : ∀ (w : W) (X Y : Set W), C w X Y ↔ C w Y X
   C_coh    : ∀ (w : W) (X Y : Set W), f w X ⊆ Y → C w X Y
-  -- Upward persistence for ◦
   C_her    : ∀ {w x : W} (X Y : Set W), le w x → C w X Y → C x X Y
-  -- Strong hypothetical syllogism (Cut) for `f`
-  Cut      : ∀ (w : W) (X Y Z : Set W), f w X ⊆ Y → f w Y ⊆ Z → f w X ⊆ Z
+
+  -- NEW: Guarded hypothetical syllogism (matches axiom 1.5 exactly)
+  TrNeq    :
+    ∀ (w : W) (X Y Z : Set W),
+      ¬ ((f w X ⊆ Y) ∧ (f w Y ⊆ X)) →   -- X ≉w Y
+      ¬ ((f w Y ⊆ Z) ∧ (f w Z ⊆ Y)) →   -- Y ≉w Z
+      ¬ ((f w X ⊆ Z) ∧ (f w Z ⊆ X)) →   -- X ≉w Z
+      f w X ⊆ Y → f w Y ⊆ Z → f w X ⊆ Z
 
 /-- An NL-model: a frame and a valuation of atoms **by up-sets** (persistence). -/
 structure Model (α : Type u) where
