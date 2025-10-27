@@ -35,8 +35,7 @@ def Ccan (Γ : WCan α) (X Y : Set (WCan α)) : Prop :=
       let hXA : X = tsetC A := Classical.choose_spec hX
       let B := Classical.choose hY
       let hYB : Y = tsetC B := Classical.choose_spec hY
-      -- SYMMETRIC predicate: “at least one direction holds”
-      ((A ◦ B) ∈ Γ.carrier) ∨ ((B ◦ A) ∈ Γ.carrier)
+      (A ◦ B) ∈ Γ.carrier
     else True
   else True
 
@@ -142,22 +141,8 @@ def CanonicalFrame : Frame (WCan α) where
     · -- fallback: upC Γ ∩ X
       exact (And.left hΔ)
 
-  -- C_symm
-  C_symm := by
-    intro Γ X Y
-    classical
-    by_cases hX : Definable X
-    · by_cases hY : Definable Y
-      · -- definable/definable: the body is `(_ ∨ _)`, so symmetry is `or_comm`
-        rcases hX with ⟨A, hXA⟩; rcases hY with ⟨B, hYB⟩
-        -- unfold both sides, then use commutativity of ∨
-        constructor <;> intro h
-        all_goals
-          simpa [Ccan, hX, hY, hXA, hYB, or_comm] using h
-      · -- definable / non-definable
-        simp [Ccan, hX, hY]
-    · -- non-definable / _
-      simp [Ccan, hX]
+  -- C_symm intentionally not provided in this variant:
+  -- the frame interface no longer requires symmetry of C.
 
   -- C_coh : f Γ X ⊆ Y ⇒ C Γ X Y
   C_coh := by
@@ -192,6 +177,54 @@ def CanonicalFrame : Frame (WCan α) where
         simpa [Ccan, hX, hY, hXA, hYB] using this
       · exact True.intro
     · exact True.intro
+    
+  TrNeq := by
+  intro Γ X Y Z hNeqXY hNeqYZ hNeqXZ hXY hYZ
+  classical
+  by_cases hX : Definable X
+  · by_cases hY : Definable Y
+    · by_cases hZ : Definable Z
+      ·
+        -- Definable/definable/definable: X=[[A]], Y=[[B]], Z=[[C]]
+        rcases hX with ⟨A, hXA⟩
+        rcases hY with ⟨B, hYB⟩
+        rcases hZ with ⟨C, hZC⟩
+
+        -- From the two inclusions, read off Γ ⊨ (A→B) and Γ ⊨ (B→C)
+        have hAB_Sat : SatC Γ (A →ₗ B) :=
+          by simpa [fC, hXA, hYB, SatC_imp_iff_subset] using hXY
+        have hBC_Sat : SatC Γ (B →ₗ C) :=
+          by simpa [fC, hYB, hZC, SatC_imp_iff_subset] using hYZ
+
+        -- Turn those into membership in Γ via Truth Lemma
+        have hAB_mem : (A →ₗ B) ∈ Γ.carrier := (truth_lemmaC _ Γ).1 hAB_Sat
+        have hBC_mem : (B →ₗ C) ∈ Γ.carrier := (truth_lemmaC _ Γ).1 hBC_Sat
+
+        -- Goal: fC Γ X ⊆ Z  i.e.  Fcan Γ A ⊆ [[C]]
+        intro Δ hΔ
+        -- unwrap Δ ∈ Fcan Γ A to the underlying Fset
+        change Δ.carrier ∈ Fset Γ.carrier A at hΔ
+        rcases hΔ with ⟨hWΔ, hSub, hAll⟩
+
+        -- From (A→B) ∈ Γ and the defining property of Fset, get B ∈ Δ
+        have hB_in_Δ : B ∈ Δ.carrier := hAll B hAB_mem
+
+        -- Since Γ ⊆ Δ, we also have (B→C) ∈ Δ
+        have hBC_in_Δ : (B →ₗ C) ∈ Δ.carrier := hSub hBC_mem
+
+        -- Close under MP in the world Δ to obtain C ∈ Δ
+        have hC_in_Δ : C ∈ Δ.carrier := (World.mp hWΔ) hB_in_Δ hBC_in_Δ
+
+        -- Repackage as canonical satisfaction: Δ ∈ [[C]]
+        have : SatC ⟨Δ.carrier, hWΔ⟩ C := (truth_lemmaC C ⟨Δ.carrier, hWΔ⟩).2 hC_in_Δ
+        simpa [tsetC] using this
+      · -- at least one side non-definable: harmless fallback
+        intro Δ hΔ; exact hΔ
+    · -- at least one side non-definable: harmless fallback
+      intro Δ hΔ; exact hΔ
+  · -- X non-definable: harmless fallback
+    intro Δ hΔ; exact hΔ
+
 
 /-- The canonical model over the canonical frame. -/
 def CanonicalModel : Model α :=
@@ -219,12 +252,8 @@ theorem sat_frame_eq_canonical (A : Formula α) (Γ : WCan α) :
   | atom p => simp [CanonicalModel, Model.Sat, Model.tset, SatC]
   | conj A B ihA ihB => simp [CanonicalModel, Model.Sat, Model.tset, SatC, ihA, ihB]
   | circ A B =>
-    -- Frame truth uses Ccan (∨); canonical truth uses membership of (A ◦ B).
-    -- We identify them via `circ_or_pick_left`.
-    have : (((A ◦ B) ∈ Γ.carrier) ∨ ((B ◦ A) ∈ Γ.carrier)) ↔ ((A ◦ B) ∈ Γ.carrier) :=
-      circ_or_pick_left Γ A B
-    simpa [CanonicalModel, Model.Sat, Model.tset, SatC, Ccan, Definable]
-      using this
+    -- With Ccan on definables = membership of (A ◦ B), the two truths coincide.
+    simp [CanonicalModel, Model.Sat, Model.tset, SatC, Ccan, Definable]
   | neg A ih =>
       -- Kripke clause matches by construction of `leC`
       simp [CanonicalModel, Model.Sat, Model.tset, SatC, ih]
