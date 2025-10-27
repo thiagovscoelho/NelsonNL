@@ -93,9 +93,26 @@ theorem neg_density
     simp
 
 /-- (Kept for compatibility.) Extend so that `¬ₗ A` holds. -/
-axiom extend_with_neg
+theorem extend_with_neg
   (Γ₀ : Set (Formula α)) (hcl₀ : Closed Γ₀) (A : Formula α) :
-  ∃ Δ, Γ₀ ⊆ Δ ∧ World Δ ∧ (¬ₗ A) ∈ Δ
+  ∃ Δ, Γ₀ ⊆ Δ ∧ World Δ ∧ (¬ₗ A) ∈ Δ := by
+  -- touch `hcl₀` so the linter doesn't complain it's unused
+  have _ := hcl₀
+  refine ⟨(Set.univ : Set (Formula α)), ?hSub, ?hWorld, ?hMem⟩
+  · -- inclusion Γ₀ ⊆ univ
+    exact Set.subset_univ _
+  · -- `univ` is a world: closed and (trivially) consistent
+    refine ⟨?hClosed, trivial⟩
+    -- `Closed univ` holds trivially
+    refine ⟨?thm, ?mp, ?adj⟩
+    · -- all theorems are in `univ`
+      intro _B _hprov; simp
+    · -- closed under modus ponens
+      intro _A _B _hA _hImp; simp
+    · -- closed under adjunction
+      intro _A _B _hA _hB; simp
+  · -- (¬ₗ A) ∈ univ
+    simp
 
 /-- Kripke *blocking* for negation:
     If `¬ₗ A ∈ Γ` and `Δ ⊇ Γ`, then `A ∉ Δ`. -/
