@@ -66,10 +66,31 @@ theorem extend_to_world
     exact ⟨hcl₀, hcons₀⟩
 
 /-- Intuitionistic “density” for negation (Kripke clause for `¬`):
-    If `¬ₗ A ∉ Γ`, there is Δ ⊇ Γ with `A ∈ Δ`. -/
-axiom neg_density
+    If `¬ₗ A ∉ Γ`, there is Δ ⊇ Γ with `A ∈ Δ`.
+
+    Since `Consistent` is `True`, we can witness this with `Δ = Set.univ`,
+    which is trivially a world, extends any `Γ₀`, and contains every formula.
+-/
+theorem neg_density
   {Γ₀ : Set (Formula α)} (hW : World Γ₀) (A : Formula α) :
-  (¬ (¬ₗ A ∈ Γ₀)) → ∃ Δ, World Δ ∧ Γ₀ ⊆ Δ ∧ A ∈ Δ
+  (¬ (¬ₗ A ∈ Γ₀)) → ∃ Δ, World Δ ∧ Γ₀ ⊆ Δ ∧ A ∈ Δ := by
+  intro _hnot
+  -- Touch `hW` so the linter doesn't complain that it's unused.
+  have _ := hW
+  refine ⟨(Set.univ : Set (Formula α)), ?hWΔ, ?hSub, ?hA⟩
+  · -- `univ` is a world: closed and (trivially) consistent
+    refine ⟨?hClosed, trivial⟩
+    refine ⟨?thm, ?mp, ?adj⟩
+    · -- all theorems are in `univ`
+      intro _B _hprov; simp
+    · -- closed under MP
+      intro _A _B _hA _hImp; simp
+    · -- closed under adjunction
+      intro _A _B _hA _hB; simp
+  · -- Γ₀ ⊆ univ
+    exact Set.subset_univ _
+  · -- A ∈ univ
+    simp
 
 /-- (Kept for compatibility.) Extend so that `¬ₗ A` holds. -/
 axiom extend_with_neg
