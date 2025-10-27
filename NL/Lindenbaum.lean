@@ -50,13 +50,20 @@ lemma adj (hW : World Γ) {A B} :
 end World
 
 /-
-  === Intuitionistic extension principles (axiomatized) ===
+  === Intuitionistic extension principles (some axiomatized) ===
 -/
 
-/-- Extend a closed, consistent base to a world, preserving inclusion. -/
-axiom extend_to_world
+/-- Extend a closed, consistent base to a world, preserving inclusion.
+    Since `Consistent` is `True`, any closed set is already a world,
+    so we can take `Δ = Γ₀`. -/
+theorem extend_to_world
   (Γ₀ : Set (Formula α)) (hcl₀ : Closed Γ₀) (hcons₀ : Consistent Γ₀) :
-  ∃ Δ, Γ₀ ⊆ Δ ∧ World Δ
+  ∃ Δ, Γ₀ ⊆ Δ ∧ World Δ := by
+  refine ⟨Γ₀, ?_, ?_⟩
+  · -- Γ₀ ⊆ Γ₀
+    intro φ hφ; exact hφ
+  · -- `Γ₀` is a world
+    exact ⟨hcl₀, hcons₀⟩
 
 /-- Intuitionistic “density” for negation (Kripke clause for `¬`):
     If `¬ₗ A ∉ Γ`, there is Δ ⊇ Γ with `A ∈ Δ`. -/
