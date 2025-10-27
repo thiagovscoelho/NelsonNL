@@ -27,7 +27,8 @@ def fC (Γ : WCan α) (X : Set (WCan α)) : Set (WCan α) :=
   else
     upC Γ ∩ X  -- harmless fallback (satisfies Id/Her/Succ/f_up)
 
-/-- Canonical compatibility: agree with `(A ◦ B) ∈ Γ` on definable pairs, `True` otherwise. -/
+/-- Canonical compatibility: on definable pairs use a **symmetric** disjunction,
+    otherwise default to `True`. -/
 def Ccan (Γ : WCan α) (X Y : Set (WCan α)) : Prop :=
   if hX : Definable X then
     if hY : Definable Y then
@@ -35,7 +36,7 @@ def Ccan (Γ : WCan α) (X Y : Set (WCan α)) : Prop :=
       let hXA : X = tsetC A := Classical.choose_spec hX
       let B := Classical.choose hY
       let hYB : Y = tsetC B := Classical.choose_spec hY
-      (A ◦ B) ∈ Γ.carrier
+      ((A ◦ B) ∈ Γ.carrier) ∨ ((B ◦ A) ∈ Γ.carrier)
     else True
   else True
 
@@ -141,8 +142,20 @@ def CanonicalFrame : Frame (WCan α) where
     · -- fallback: upC Γ ∩ X
       exact (And.left hΔ)
 
-  -- C_symm intentionally not provided in this variant:
-  -- the frame interface no longer requires symmetry of C.
+  -- C_symm : symmetry of Ccan
+  C_symm := by
+    intro Γ X Y
+    classical
+    by_cases hX : Definable X
+    · by_cases hY : Definable Y
+      · rcases hX with ⟨A, hXA⟩; rcases hY with ⟨B, hYB⟩
+        constructor <;> intro h
+        · simpa [Ccan, hX, hY, hXA, hYB, or_comm] using h
+        · simpa [Ccan, hX, hY, hXA, hYB, or_comm] using h
+      · -- one side non-definable: both sides are `True`
+        exact Iff.intro (fun _ => True.intro) (fun _ => True.intro)
+    · -- X non-definable: both sides are `True`
+      exact Iff.intro (fun _ => True.intro) (fun _ => True.intro)
 
   -- C_coh : f Γ X ⊆ Y ⇒ C Γ X Y
   C_coh := by
@@ -152,15 +165,14 @@ def CanonicalFrame : Frame (WCan α) where
     · by_cases hY : Definable Y
       · rcases hX with ⟨A, hXA⟩; rcases hY with ⟨B, hYB⟩
         -- read `hXY` as SatC Γ (A→B), then Truth Lemma gives (A→B) ∈ Γ,
-        -- hence by axiom 1.4 we get (A◦B) at Γ, which is exactly `Ccan`.
+        -- hence by axiom 1.4 we get (A◦B) ∈ Γ; wrap it as `Or.inl`.
         have hImp : SatC Γ (A →ₗ B) := by
-          -- fC Γ [[A]] ⊆ [[B]]
-          simpa [fC, hX, hY, hXA, hYB, SatC_imp_iff_subset]
-            using hXY
+          simpa [fC, hX, hY, hXA, hYB, SatC_imp_iff_subset] using hXY
         have hImp_mem : (A →ₗ B) ∈ Γ.carrier := (truth_lemmaC _ Γ).1 hImp
         have hCirc_mem : (A ◦ B) ∈ Γ.carrier :=
           (World.thm Γ.world) (PS.ax14 A B) |> (World.mp Γ.world) hImp_mem
-        simpa [Ccan, hX, hY, hXA, hYB] using hCirc_mem
+        have : ((A ◦ B) ∈ Γ.carrier) ∨ ((B ◦ A) ∈ Γ.carrier) := Or.inl hCirc_mem
+        simpa [Ccan, hX, hY, hXA, hYB] using this
       · exact True.intro
     · exact True.intro
 
@@ -171,10 +183,14 @@ def CanonicalFrame : Frame (WCan α) where
     by_cases hX : Definable X
     · by_cases hY : Definable Y
       · rcases hX with ⟨A, hXA⟩; rcases hY with ⟨B, hYB⟩
-        -- Ccan Γ X Y is `(A◦B) ∈ Γ`. Upward closure of worlds ensures inclusion.
-        have : (A ◦ B) ∈ Γ'.carrier :=
-          hle ((by simpa [Ccan, hX, hY, hXA, hYB] using hC))
-        simpa [Ccan, hX, hY, hXA, hYB] using this
+        -- From `hC` (a disjunction) and Γ ≤ Γ', push the chosen side up.
+        have hDisj :
+          ((A ◦ B) ∈ Γ.carrier) ∨ ((B ◦ A) ∈ Γ.carrier) :=
+          by simpa [Ccan, hX, hY, hXA, hYB] using hC
+        have hDisj' :
+          ((A ◦ B) ∈ Γ'.carrier) ∨ ((B ◦ A) ∈ Γ'.carrier) :=
+          hDisj.elim (fun h => Or.inl (hle h)) (fun h => Or.inr (hle h))
+        simpa [Ccan, hX, hY, hXA, hYB] using hDisj'
       · exact True.intro
     · exact True.intro
     
@@ -234,15 +250,6 @@ def CanonicalModel : Model α :=
 , V_mono := by
     intro p Γ Δ hΓp hle
     exact hle hΓp }
-
--- Pick the “left” disjunct when relating frame-◦ to canonical-◦
-private lemma circ_or_pick_left
-  (Γ : WCan α) (A B : Formula α) :
-  (((A ◦ B) ∈ Γ.carrier) ∨ ((B ◦ A) ∈ Γ.carrier)) ↔ ((A ◦ B) ∈ Γ.carrier) :=
-by
-  constructor
-  · intro h; exact h.elim id (fun hBA => hBA)  -- if needed, keep left; otherwise accept right
-  · intro h; exact Or.inl h
 
 /-- Bridge: frame-based truth in the canonical model agrees with canonical `SatC`. -/
 theorem sat_frame_eq_canonical (A : Formula α) (Γ : WCan α) :
