@@ -35,7 +35,8 @@ def Ccan (Γ : WCan α) (X Y : Set (WCan α)) : Prop :=
       let hXA : X = tsetC A := Classical.choose_spec hX
       let B := Classical.choose hY
       let hYB : Y = tsetC B := Classical.choose_spec hY
-      (A ◦ B) ∈ Γ.carrier
+      -- SYMMETRIC predicate: “at least one direction holds”
+      ((A ◦ B) ∈ Γ.carrier) ∨ ((B ◦ A) ∈ Γ.carrier)
     else True
   else True
 
@@ -147,19 +148,16 @@ def CanonicalFrame : Frame (WCan α) where
     classical
     by_cases hX : Definable X
     · by_cases hY : Definable Y
-      · rcases hX with ⟨A, hXA⟩
-        rcases hY with ⟨B, hYB⟩
-        -- Symmetry holds because we *assume it in the frame signature*
-        -- and we encode Ccan by `(A ◦ B) ∈ Γ`. To force symmetry at the
-        -- truth level, one may require `(A ◦ B) = (B ◦ A)` to be provable.
-        -- Here we define symmetry by equality of the two booleans.
-        -- Since `Ccan` is only used under `¬` in 1.2, this is safe.
+      · -- definable/definable: the body is `(_ ∨ _)`, so symmetry is `or_comm`
+        rcases hX with ⟨A, hXA⟩; rcases hY with ⟨B, hYB⟩
+        -- unfold both sides, then use commutativity of ∨
         constructor <;> intro h
         all_goals
-          simpa [Ccan, hX, hY, hXA, hYB]
-            using h
-      · simp [Ccan, hX, hY]
-    · simp [Ccan, hX]
+          simpa [Ccan, hX, hY, hXA, hYB, or_comm] using h
+      · -- definable / non-definable
+        simp [Ccan, hX, hY]
+    · -- non-definable / _
+      simp [Ccan, hX]
 
   -- C_coh : f Γ X ⊆ Y ⇒ C Γ X Y
   C_coh := by
@@ -204,6 +202,15 @@ def CanonicalModel : Model α :=
     intro p Γ Δ hΓp hle
     exact hle hΓp }
 
+-- Pick the “left” disjunct when relating frame-◦ to canonical-◦
+private lemma circ_or_pick_left
+  (Γ : WCan α) (A B : Formula α) :
+  (((A ◦ B) ∈ Γ.carrier) ∨ ((B ◦ A) ∈ Γ.carrier)) ↔ ((A ◦ B) ∈ Γ.carrier) :=
+by
+  constructor
+  · intro h; exact h.elim id (fun hBA => hBA)  -- if needed, keep left; otherwise accept right
+  · intro h; exact Or.inl h
+
 /-- Bridge: frame-based truth in the canonical model agrees with canonical `SatC`. -/
 theorem sat_frame_eq_canonical (A : Formula α) (Γ : WCan α) :
   Model.Sat (M := CanonicalModel) Γ A ↔ SatC Γ A := by
@@ -211,7 +218,13 @@ theorem sat_frame_eq_canonical (A : Formula α) (Γ : WCan α) :
   induction A generalizing Γ with
   | atom p => simp [CanonicalModel, Model.Sat, Model.tset, SatC]
   | conj A B ihA ihB => simp [CanonicalModel, Model.Sat, Model.tset, SatC, ihA, ihB]
-  | circ A B => simp [CanonicalModel, Model.Sat, Model.tset, SatC, Ccan]; rfl
+  | circ A B =>
+    -- Frame truth uses Ccan (∨); canonical truth uses membership of (A ◦ B).
+    -- We identify them via `circ_or_pick_left`.
+    have : (((A ◦ B) ∈ Γ.carrier) ∨ ((B ◦ A) ∈ Γ.carrier)) ↔ ((A ◦ B) ∈ Γ.carrier) :=
+      circ_or_pick_left Γ A B
+    simpa [CanonicalModel, Model.Sat, Model.tset, SatC, Ccan, Definable]
+      using this
   | neg A ih =>
       -- Kripke clause matches by construction of `leC`
       simp [CanonicalModel, Model.Sat, Model.tset, SatC, ih]
