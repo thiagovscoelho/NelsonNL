@@ -1,0 +1,33 @@
+{
+  "primitive_boolean_model": {
+    "checks": {
+      "A1": 2,
+      "A2": 4,
+      "A3": 2,
+      "A4": 4,
+      "A5": 8,
+      "A6": 4,
+      "A7": 8,
+      "MP": 4,
+      "Adj": 4
+    },
+    "total_checks": 40,
+    "failures": {},
+    "aristotle_AT1_at_p_0": 0
+  },
+  "defined_six_element_candidate": {
+    "checks": {
+      "A1": 6,
+      "A2": 36,
+      "A3": 6,
+      "A4": 36,
+      "A5": 216,
+      "A6": 36,
+      "A7": 216,
+      "MP": 36,
+      "Adj": 36
+    },
+    "total_checks": 624,
+    "failures": {}
+  }
+}

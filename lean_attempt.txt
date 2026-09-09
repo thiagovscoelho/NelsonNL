@@ -1,0 +1,2 @@
+Lean verification NOT performed: lean executable not found.
+Exit status: 127

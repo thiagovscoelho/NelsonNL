@@ -1,0 +1,10 @@
+{
+  "NLDefined.lean": "9f8474f2f52715088f4ac4ee6eb9d327cf0ddb31510430ce1cb1b016d4b12ffa",
+  "NLPrimitive.lean": "6c5e815110302fab0d5ed9d78d882c4609beb95cd6494bfa93404c78ade57063",
+  "README.md": "7eeb55eed91bed68ffd11f4cbe5cec21eb9ce4078ffae647fec282038a7010db",
+  "check.sh": "745ff9ed2bdc60e8fababa5dcd83166b903328c44bcdda99aa78b9526f455d52",
+  "check_finite_models.py": "3dbad661b54d19b9b1ddca05ed3c6d78511933eaafda6b516176e8fd803fde07",
+  "finite_checks.json": "dfe453e6d88030b4d0b525ffd93ed837a6efbb3145a0f5d922badd55ddd9cb1d",
+  "lean-toolchain": "55e97be96000b5e9e290c9e74482e5e317861499a5540353ce845471bded8cea",
+  "lean_attempt.txt": "192856a1c25f5a964f8bfd5b86f6193e1aa08febb917b36829011cc123aba7f5"
+}
