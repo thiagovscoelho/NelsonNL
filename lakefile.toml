@@ -1,0 +1,7 @@
+name = "NelsonNL"
+version = "0.1.0"
+defaultTargets = ["NelsonNL"]
+
+[[lean_lib]]
+name = "NelsonNL"
+roots = ["NLPrimitive", "NLDefined"]
