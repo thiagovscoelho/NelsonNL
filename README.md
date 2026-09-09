@@ -60,9 +60,17 @@ both Lean files and the Python checks together.
 
 ## Two readings of implication
 
-The original problem listed seven axiom schemas and two rules, but did not
-define implication. The project keeps that literal reading separate from
-the reading with Nelson's definition:
+The project began with the presentation of NL copied from Section 3.6 of the
+Stanford Encyclopedia of Philosophy's [“Connexive Logic” article](https://plato.stanford.edu/entries/logic-connexive/).
+That passage describes finding a sound and complete semantics for NL as an
+open problem, which motivated this project's attempt to construct and verify
+one.
+
+The copied presentation lists seven axiom schemas and two rules but omits
+the definition of implication. Read literally, that omission gives a different
+calculus from the intended one. The project therefore treats both the
+incomplete specification as written and the same calculus with Nelson's
+implication definition restored:
 
 $$
 A \to B := \neg(A \circ \neg B).
@@ -80,6 +88,13 @@ Each module has its own syntax and namespace. Start with `NLDefined` for the
 defined-implication reading, or `NLPrimitive` to study the effect of leaving
 implication unconstrained by that definition. This difference changes the
 theorems, not just their notation.
+
+The Lean results supply sound-and-complete general matrix semantics for both
+versions: the problem arising from the omitted definition and the intended
+seven-axiom, two-rule problem with that definition included. This answers the
+request for semantics in the general matrix sense explained below; it is not
+a claim to settle every stronger semantic or historical reconstruction
+question associated with the SEP's open-problem statement.
 
 ## The exact calculus
 
