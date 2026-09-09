@@ -1,157 +1,228 @@
-# NL: general matrix semantics and Lean source
+# NelsonNL: matrix semantics for Nelson's logic in Lean
 
-## Verification status
+This project formalizes soundness and strong completeness for two readings of
+the seven-axiom, two-rule presentation of Everett J. Nelson's logic NL. Both
+developments prove, for any set of premises Γ and formula A,
 
-**The Lean files have not been executed or kernel-checked in this environment.**
-A Lean executable was unavailable, and attempts to obtain a compiler did not
-succeed. `lean_attempt.txt` records the failed local invocation. Do not treat
-this package as an already kernel-verified result.
+$$
+\Gamma \vdash A \quad\Longleftrightarrow\quad \Gamma \models A.
+$$
 
-The mathematical soundness and completeness proof is given below. The Lean
-files contain complete proof scripts with no `sorry`, `admit`, extra `axiom`
-declarations, `unsafe` declarations, or `native_decide`. Their compilation
-remains to be checked with Lean. The target toolchain is pinned in
-`lean-toolchain` to Lean 4.19.0; only the standard library is imported.
+The semantics uses algebras with designated values (logical matrices). The
+repository also supplies finite models, proofs that both calculi are
+nontrivial, and results showing why the definition of implication matters.
 
-Independent Python exhaustive checks *were* executed. Both finite matrices
-passed every instance of the seven axioms and two rule-preservation conditions:
-40 instances for the Boolean matrix and 624 for the six-element matrix.
-These finite checks are not a verification of the general completeness theorem.
+**Verified:** a fresh `lake build` succeeded with Lean **4.24.0**, compiling
+both source modules with no errors. `NLDefined.lean` emits non-fatal linter
+warnings about local names resembling constructors. Both files import only
+`Std`; no Mathlib or other external Lean packages are required.
 
-## Files
+## Build and check
 
-| File | Purpose |
-|---|---|
-| `NLPrimitive.lean` | Exact displayed calculus, treating implication as primitive; general matrix soundness, strong completeness, a canonical countermodel, a Boolean model, and nonderivability of Aristotle's first thesis. |
-| `NLDefined.lean` | Same seven axioms and two rules, but implication is defined as `neg (compat A (neg B))`; analogous matrix results, a six-element model, and derivations of both Aristotle theses. |
-| `check_finite_models.py` | Standalone exhaustive finite-model tests using Python's standard library. |
-| `finite_checks.json` | Actual output of the executed Python tests. |
-| `check.sh` | Runs Lean on both files and then reruns the Python tests. |
-| `lean-toolchain` | Target Lean version, for use with elan. |
-| `lean_attempt.txt` | Actual unsuccessful Lean invocation in the authoring environment. |
-
-With Lean available, run from this directory:
+With Lean's `elan` toolchain manager installed and `lake` on your PATH, run
+these commands from the repository root:
 
 ```sh
-./check.sh
+lean --version
+lake build
 ```
 
-Or run the files separately:
+[lean-toolchain](lean-toolchain) pins `leanprover/lean4:v4.24.0`.
+[lakefile.toml](lakefile.toml) makes both `NLPrimitive` and `NLDefined` roots
+of the default library target. A successful build ends with
+`Build completed successfully`. To rebuild from scratch, run `lake clean`
+followed by `lake build`.
+
+To check one source file directly and see its theorem-dependency reports:
 
 ```sh
-lean NLPrimitive.lean
-lean NLDefined.lean
+lake env lean NLPrimitive.lean
+lake env lean NLDefined.lean
+```
+
+The optional Python checks require Python 3.9 or newer and no third-party
+packages:
+
+```sh
 python3 check_finite_models.py
 ```
 
-The `#print axioms` commands ask Lean to report dependencies of the principal
-theorems. There is no claimed or fabricated output from these commands here.
+On Windows, use `python check_finite_models.py` if that is your Python command.
+The output should contain empty `failures` objects for both models, with
+`total_checks` equal to **40** and **624**, respectively. These results have
+been reproduced locally and agree with [finite_checks.json](finite_checks.json).
+Inspect both `failures` objects: the script currently asserts success only for
+the Boolean model. These checks supplement the Lean proofs; they do not prove
+general completeness.
 
-## Exact scope
+In a Bash environment with `lean` and `python3` on PATH, `bash check.sh` runs
+both Lean files and the Python checks together.
 
-The construction is a general algebraic logical-matrix semantics, not an
-NL-specific relational representation theorem or a finite truth-table
-completeness theorem. The model conditions are a finite universal-Horn
-translation of the displayed axioms and rules. They do not mention derivations.
-The completeness argument uses a canonical term-algebra matrix.
+## Two readings of implication
 
-The historical definition of implication is absent from the question's list of
-definitions, so both readings are kept separate. Neither file adds conjunction
-elimination, replacement of provable equivalents, associativity, unrestricted
-transitivity of object-language implication, or a deduction theorem.
+The original problem listed seven axiom schemas and two rules, but did not
+define implication. The project keeps that literal reading separate from
+the reading with Nelson's definition:
 
-The abbreviation for three inequalities is left-associated, in the order
-AB, BC, AC. Right association would define a different displayed schema unless
-associativity is independently established; the same construction would work
-with that choice after changing `Ops.distinct3`.
+$$
+A \to B := \neg(A \circ \neg B).
+$$
 
-For nonempty premise sets, `Derives` is the natural local extension of the two
-rules. For the empty premise set, it is precisely the theorem-generating
-calculus specified by the corresponding reading.
+Here `◦` is the primitive consistency/compatibility connective, named `compat`
+in Lean.
 
-## Semantic specification
+| Module | Primitive connectives | Distinguishing result |
+|---|---|---|
+| [NLPrimitive.lean](NLPrimitive.lean) | Negation, conjunction, compatibility, implication | `¬(p → ¬p)` is not derivable. |
+| [NLDefined.lean](NLDefined.lean) | Negation, conjunction, compatibility; implication is defined above | Both Aristotle theses, `¬(A → ¬A)` and `¬(¬A → A)`, are derivable for every formula A. |
 
-For the primitive reading, an algebra has a nonempty carrier X and operations
-`neg`, `conj`, `compat`, and `arr`, of arities 1, 2, 2, and 2. In the defined
-reading it has only the first three, with
+Each module has its own syntax and namespace. Start with `NLDefined` for the
+defined-implication reading, or `NLPrimitive` to study the effect of leaving
+implication unconstrained by that definition. This difference changes the
+theorems, not just their notation.
 
-```text
-arr(a,b) = neg(compat(a,neg(b))).
-```
+## The exact calculus
 
-In either case define algebraic terms
-
-```text
-inc(a,b)         = neg(compat(a,b))
-eqv(a,b)         = conj(arr(a,b),arr(b,a))
-neq(a,b)         = neg(eqv(a,b))
-distinct3(a,b,c) = conj(conj(neq(a,b),neq(b,c)),neq(a,c)).
-```
-
-The terms `s1` through `s7` in each Lean file are exactly the seven axiom
-patterns, with these expansions. A matrix consists of such an algebra and a
-predicate D on its carrier, satisfying universally:
+The following abbreviations are used in both developments:
 
 ```text
-D(s1(a))                         D(s2(a,b))
-D(s3(a))                         D(s4(a,b))
-D(s5(a,b,c))                     D(s6(a,b))
-D(s7(a,b,c))
-D(a) and D(arr(a,b)) imply D(b)
-D(a) and D(b) imply D(conj(a,b)).
+A | B       := ¬(A ◦ B)
+A = B       := (A → B) ∧ (B → A)
+A ≠ B       := ¬(A = B)
+A ≠ B ≠ C   := ((A ≠ B) ∧ (B ≠ C)) ∧ (A ≠ C)
 ```
 
-The term `eqv(a,b)` is an algebra element, not actual equality. The term
-`neq(a,b)` is not actual inequality. In particular, `s6` does not impose literal
-commutativity of the algebra operation, and the premise in `s5` is not a
-metatheoretic distinctness condition.
+The equality and inequality symbols here denote formulas, not Lean equality
+or inequality. The last abbreviation is left-associated in the order AB,
+BC, AC; no associativity law is assumed.
 
-A valuation sends variables to carrier elements and evaluates formulas
-homomorphically. A formula is satisfied when its value belongs to D. Semantic
-consequence quantifies over every such matrix and every valuation, preserving
-satisfaction of premises. This definition does not mention `Derives`.
+The schemas `s1` through `s7` encode:
 
-## Soundness and completeness proof
+```text
+1.1  A → A
+1.2  (A | B) → (B | A)
+1.3  A → ¬¬A
+1.4  (A → B) → (A ◦ B)
+1.5  (A ≠ B ≠ C) → (((A → B) ∧ (B → C)) → (A → C))
+1.6  (A ∧ B) = (B ∧ A)
+1.7  ((A ∧ B) → C) → ((A ∧ ¬C) → ¬B)
+```
 
-**Soundness.** Induct on a derivation. An assumption is designated by premise
-satisfaction. Each axiom instance is designated by the corresponding universal
-matrix condition. Modus ponens and adjunction preserve designation by the last
-two conditions. Thus derivability implies semantic consequence.
+There are two inference rules:
 
-**Completeness.** Fix a premise predicate Gamma. Let the carrier be the set of
-formulas in the relevant primitive signature; use the formula constructors as
-its algebra operations. Designate exactly those formulas derivable from Gamma.
-This is a matrix: all seven axiom patterns are designated, and the designated
-set is closed under the two rules. Let the canonical valuation map each
-variable to itself. Structural induction gives `eval(A) = A`, so a formula is
-satisfied under this valuation exactly when it is derivable from Gamma.
-Every premise is satisfied. If Gamma semantically entails A, apply that
-entailment to this particular matrix and valuation to conclude that A is
-derivable. Equivalently, every nonderivable formula has this canonical
-countermodel relative to Gamma.
+- **Modus ponens:** from A and A → B, infer B.
+- **Adjunction:** from A and B, infer A ∧ B.
 
-The model class is defined independently of derivability. Using derivability
-to construct a witness *within* that class in the completeness proof is not a
-definition of semantic validity as provability.
+`Derives Γ A` extends these rules to proofs from premises in Γ. With Γ empty,
+it gives theoremhood. Conjunction elimination, replacement of provable
+equivalents, associativity, unrestricted transitivity of implication, and a
+deduction theorem are not added as rules or assumptions.
 
-## Finite models and the missing implication definition
+## How the semantics works
 
-For the primitive reading, use Boolean negation and conjunction, material
-implication, constant-true compatibility, and designated value true. This
-satisfies all the displayed axioms and rules. At p=false, however,
-`neg(arr(p,neg(p)))` is false. Consequently Aristotle's first thesis is not a
-theorem of the primitive-implication reading. This matrix does not satisfy the
-additional definition of implication used by Nelson.
+A `Matrix α` consists of a nonempty carrier, operations interpreting the
+primitive connectives, and a predicate `D : α → Prop` selecting designated
+values. Its conditions require every instance of `s1`–`s7` to be designated,
+and designation to be preserved by modus ponens and adjunction. These are
+finitely many universally quantified conditions on operations and `D`;
+the definition does not mention derivability.
 
-For the defined reading, the supplied six-element operation tables are taken
-from Davide Fazio and Raffaele Mascella, *Considerations on Everett J. Nelson's
-connexive logic*, arXiv:2506.10893v1 (12 June 2025), Example 4.1. The designated
-values are a, c, e. The Python test checks these tables against the axioms in
-the question, not merely against the paper's presentation. In particular, it
-checks inconsistency symmetry and conjunctive guarded transitivity exactly as
-encoded by `s2` and `s5` here. No completeness theorem from the paper is assumed.
+A valuation assigns carrier elements to propositional variables, indexed by
+`Nat`. `eval` extends this assignment recursively to formulas. A formula is
+satisfied when its value is designated. `Entails Γ A` says that every matrix
+and valuation satisfying all premises in Γ also satisfies A.
 
-The same preprint uses the historical implication definition in Section 3 and
-studies presentations with further inference rules. Its richer
-algebraic-relational completeness results are not being silently transferred
-to the two-rule systems in this package.
+The operations need not behave like Boolean connectives. In particular,
+schema 1.6 requires a designated equivalence formula, not literal equality
+of the values of A ∧ B and B ∧ A. The guard in 1.5 uses the formula `≠`,
+not actual distinctness of carrier elements.
+
+Soundness follows by induction on derivations: matrix conditions validate
+axioms and preserve designation at each rule application.
+
+For completeness, fix Γ and take formulas themselves as the carrier, with
+formula constructors as operations and Γ-derivable formulas as designated
+values. This is the **canonical matrix**. Under the valuation sending each
+variable to itself, evaluation returns the original formula. The resulting
+truth lemma identifies satisfaction in this matrix with derivability from Γ.
+Applying semantic consequence to this matrix proves completeness; a formula
+not derivable from Γ has the same matrix as a countermodel.
+
+The construction takes no quotient by provable equivalence and therefore
+needs no replacement or congruence assumption. Derivability is used to
+construct this particular model, while the model class and semantic
+consequence are defined independently of it.
+
+This establishes general matrix completeness for the displayed calculi.
+It does not establish completeness for a single finite truth table, a
+decision procedure, or an algebraic-relational representation theorem.
+
+## Finding and using the Lean results
+
+Both modules follow the same order: syntax and operations, axiom schemas,
+derivations, matrices and evaluation, soundness, the canonical construction,
+completeness, then finite models and examples.
+
+| Declaration in each namespace | Result |
+|---|---|
+| `sound`, `complete` | The two directions relating `Derives` and `Entails`. |
+| `sound_complete` | `Derives Γ A ↔ Entails Γ A` for arbitrary premise predicates. |
+| `theorem_iff_valid` | The empty-premise case: `Theorem A ↔ Valid A`. |
+| `canonical_truth` | Satisfaction under the canonical valuation iff derivability. |
+| `canonical_countermodel` | A countermodel for any formula not derivable from Γ. |
+| `nontrivial` | Variable 0 is not a theorem. |
+
+After building, import the modules by their names, rather than `NelsonNL`:
+
+```lean
+import NLPrimitive
+import NLDefined
+
+#check NLPrimitive.sound_complete
+#check NLDefined.sound_complete
+#check NLPrimitive.aristotle_not_derivable
+#check NLDefined.aristotle1
+#check NLDefined.aristotle2
+```
+
+The files contain no `sorry`, `admit`, additional `axiom` declarations,
+`unsafe` declarations, or `native_decide`. Their `#print axioms` commands
+report `[propext]` for `sound_complete`, `theorem_iff_valid`, and
+`canonical_countermodel` in both namespaces. `propext` is Lean's standard
+propositional extensionality axiom. The reported nontriviality and Aristotle
+results have no axiom dependencies.
+
+## Finite models and references
+
+`NLPrimitive.boolMatrix` uses Boolean negation and conjunction, material
+implication, constant-true compatibility, and designated value `true`.
+All matrix conditions hold. At p = false, `¬(p → ¬p)` evaluates to false,
+giving the countermodel used by `aristotle_not_derivable`. This matrix does
+not satisfy the additional definition of implication, as proved by
+`bool_implication_not_defined`.
+
+`NLDefined.sixMatrix` has values a, b, c, d, e, f, with a, c, e designated.
+Its operation tables come from Example 4.1 of Davide Fazio and Raffaele
+Mascella, [*Considerations on Everett J. Nelson's connexive logic*,
+arXiv:2506.10893v1](https://arxiv.org/html/2506.10893v1#S4.Ex1)
+(12 June 2025). The paper also discusses Nelson's implication definition
+and systems with additional inference rules. Here the tables are verified
+against this repository's seven schemas and two rules; no completeness
+theorem from the paper is assumed.
+
+Both finite matrices are verified in Lean by exhaustive cases and `decide`.
+The standalone [Python script](check_finite_models.py) provides a second
+implementation of the finite checks.
+
+## Repository notes
+
+The old failure log [lean_attempt.txt](lean_attempt.txt) and verification
+comments at the top of the Lean files describe the original authoring
+environment. They predate the successful Lean 4.24.0 build reported here.
+[SHA256SUMS.json](SHA256SUMS.json) records the original source bundle's
+checksums; it is not a current-worktree integrity manifest after the Lake
+reinitialization and README update.
+
+The repository includes a [GitHub Actions workflow](.github/workflows/lean_action_ci.yml)
+for Lean builds. The build result reported above is from local verification.
+The project is released under [CC0 1.0 Universal](LICENSE).
